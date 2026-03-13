@@ -25,6 +25,10 @@ function DateField({ value, onChange }: DateFieldProps) {
         label="처리일"
         startId="processed-date-start"
         endId="processed-date-end"
+        startDate={value.processedStartAt}
+        endDate={value.processedEndAt}
+        onStartDateChange={(next) => onChange({ processedStartAt: next })}
+        onEndDateChange={(next) => onChange({ processedEndAt: next })}
       />
     </div>
   );

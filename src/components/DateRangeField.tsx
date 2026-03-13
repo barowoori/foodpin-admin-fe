@@ -84,15 +84,14 @@ function DateRangeField({
 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-2">
-          <div className="w-38">
-            <InputWrapper.Input
-              id={startId}
-              type="text"
-              readOnly
-              value={formatDateForDisplay(currentStartDate)}
-              placeholder="yyyy.mm.dd"
-            />
-          </div>
+          <InputWrapper.Input
+            id={startId}
+            type="text"
+            readOnly
+            value={formatDateForDisplay(currentStartDate)}
+            placeholder="yyyy.mm.dd"
+          />
+
           <button
             type="button"
             aria-label="시작일 선택"
@@ -115,15 +114,14 @@ function DateRangeField({
         <span className="font-pretendard text-ui-base text-fg-subtle">~</span>
 
         <div className="flex items-center gap-2">
-          <div className="w-38">
-            <InputWrapper.Input
-              id={endId}
-              type="text"
-              readOnly
-              value={formatDateForDisplay(currentEndDate)}
-              placeholder="yyyy.mm.dd"
-            />
-          </div>
+          <InputWrapper.Input
+            id={endId}
+            type="text"
+            readOnly
+            value={formatDateForDisplay(currentEndDate)}
+            placeholder="yyyy.mm.dd"
+          />
+
           <button
             type="button"
             aria-label="종료일 선택"

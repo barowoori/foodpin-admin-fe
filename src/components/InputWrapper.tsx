@@ -21,7 +21,7 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
 function Input(props: InputProps) {
   return (
     <input
-      className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 read-only:cursor-default h-11 rounded-lg border px-3 transition outline-none focus:ring-2"
+      className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 max-w-40 rounded-lg border px-3 transition outline-none read-only:cursor-default focus:ring-2"
       {...props}
     />
   );

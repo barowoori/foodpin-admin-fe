@@ -13,6 +13,8 @@ const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   approvalStatus: "APPROVED",
   startAt: "",
   endAt: "",
+  processedStartAt: "",
+  processedEndAt: "",
 };
 
 function ApprovalDashboardPage() {
@@ -26,7 +28,7 @@ function ApprovalDashboardPage() {
 
   return (
     <div className="bg-bg-app min-h-dvh w-full">
-      <div className="mx-auto w-full max-w-260 px-8 pt-24">
+      <div className="mx-auto w-full max-w-268 px-8 pt-24">
         <div className="flex justify-between">
           <h1 className="font-pretendard tracking-brand text-ui-title text-fg-primary mb-10 font-semibold">
             사업자 등록증 승인 관리
