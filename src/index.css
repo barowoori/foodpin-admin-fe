@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --font-pretendard: "Pretendard", "Noto Sans KR", sans-serif;
+  --tracking-brand: -0.02em;
+  --leading-brand: 150%;
+}
