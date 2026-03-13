@@ -25,7 +25,7 @@ function KakaoCallbackPage() {
 
         if (!isCancelled) {
           setTokens(accessToken, refreshToken);
-          navigate("/main", { replace: true });
+          navigate("/dashboard", { replace: true });
         }
       } catch {
         if (!isCancelled) {
@@ -42,7 +42,7 @@ function KakaoCallbackPage() {
   }, [navigate, setTokens]);
 
   return (
-    <div className="font-pretendard flex min-h-dvh items-center justify-center bg-[#363636] text-[#f1f1f1]">
+    <div className="font-pretendard bg-bg-app text-fg-secondary flex min-h-dvh items-center justify-center">
       Loading...
     </div>
   );

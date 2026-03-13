@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
 import KakaoCallbackPage from "./pages/KakaoCallbackPage";
 import LoginPage from "./pages/LoginPage";
-import MainPage from "./pages/MainPage";
+import ApprovalDashboardPage from "./pages/ApprovalDashboardPage";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<KakaoCallbackPage />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="main" element={<MainPage />} />
+        <Route path="dashboard" element={<ApprovalDashboardPage />} />
       </Routes>
     </BrowserRouter>
   );

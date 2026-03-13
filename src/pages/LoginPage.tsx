@@ -9,13 +9,13 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#363636] px-6">
+    <div className="flex min-h-dvh items-center justify-center bg-bg-app px-6">
       <div className="flex w-full max-w-sm flex-col items-center gap-8">
         <img src={LoginImg} alt="logo" className="w-45" />
         <button
           type="button"
           onClick={handleKakaoLogin}
-          className="font-pretendard tracking-brand leading-brand flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#fee500] font-semibold"
+          className="font-pretendard tracking-brand leading-brand flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand-kakao font-semibold"
         >
           <img src={KakakoImg} alt="kakao" className="w-4" />
           <span>카카오로 로그인</span>
@@ -26,3 +26,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+

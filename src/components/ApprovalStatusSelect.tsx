@@ -1,6 +1,5 @@
-﻿import ArrowIcon from "../assets/arrow.svg?react";
-
-export type ApprovalStatus = "APPROVED" | "REJECTED";
+import ArrowIcon from "../assets/arrow.svg?react";
+import type { ApprovalStatus } from "../types/approval";
 
 const APPROVAL_STATUS_OPTIONS: { value: ApprovalStatus; label: string }[] = [
   { value: "APPROVED", label: "승인" },
@@ -9,7 +8,7 @@ const APPROVAL_STATUS_OPTIONS: { value: ApprovalStatus; label: string }[] = [
 
 type ApprovalStatusSelectProps = {
   id?: string;
-  value?: ApprovalStatus;
+  value: ApprovalStatus;
   onChange: (value: ApprovalStatus) => void;
 };
 
@@ -24,7 +23,7 @@ function ApprovalStatusSelect({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as ApprovalStatus)}
-        className="font-pretendard h-11 w-28 cursor-pointer appearance-none rounded-lg border border-[#5a5a5a] bg-[#2b2b2b] px-3 pr-7 text-sm text-[#fafafa] transition outline-none focus:border-[#6f8198] focus:ring-2 focus:ring-[#6f8198]/30"
+        className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-28 cursor-pointer appearance-none rounded-lg border px-3 pr-7 transition outline-none focus:ring-2"
       >
         {APPROVAL_STATUS_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
@@ -32,7 +31,7 @@ function ApprovalStatusSelect({
           </option>
         ))}
       </select>
-      <ArrowIcon className="pointer-events-none absolute top-1/2 right-2.5 h-3 w-3 -translate-y-1/2 text-[#9AA5B5]" />
+      <ArrowIcon className="text-icon-primary pointer-events-none absolute top-1/2 right-2.5 h-3 w-3 -translate-y-1/2" />
     </div>
   );
 }
