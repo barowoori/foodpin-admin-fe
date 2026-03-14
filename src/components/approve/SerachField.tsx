@@ -25,17 +25,25 @@ function SerachField({ value, onChange }: SerachFieldProps) {
       </InputWrapper>
 
       <InputWrapper>
-        <InputWrapper.Label htmlFor="phone-number">휴대폰번호</InputWrapper.Label>
+        <InputWrapper.Label htmlFor="phone-number">
+          휴대폰번호
+        </InputWrapper.Label>
         <InputWrapper.Input
           id="phone-number"
-          type="text"
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={value.phoneNumber}
-          onChange={(event) => onChange({ phoneNumber: event.target.value })}
+          onChange={(event) =>
+            onChange({ phoneNumber: event.target.value.replace(/\D/g, "") })
+          }
         />
       </InputWrapper>
 
       <InputWrapper>
-        <InputWrapper.Label htmlFor="approval-status">승인 상태</InputWrapper.Label>
+        <InputWrapper.Label htmlFor="approval-status">
+          승인 상태
+        </InputWrapper.Label>
 
         <ApprovalStatusSelect
           id="approval-status"
@@ -48,4 +56,3 @@ function SerachField({ value, onChange }: SerachFieldProps) {
 }
 
 export default SerachField;
-

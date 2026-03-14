@@ -15,6 +15,7 @@ export type ApprovalFilterPatch = Partial<ApprovalFilterState>;
 export interface ApprovalTableRow {
   no: number;
   truckId: string;
+  documentType: string;
   documentId: string;
   nickname: string;
   phoneNumber: string;

@@ -30,9 +30,14 @@ type TruckDocumentListResponse = {
 function isTruckDocumentItem(
   value: TruckDocumentPageData | TruckDocumentItem,
 ): value is TruckDocumentItem {
+  const status = (value as TruckDocumentItem).status;
+  const isApprovalStatus =
+    status === "PENDING" || status === "APPROVED" || status === "REJECTED";
+
   return (
     typeof (value as TruckDocumentItem).truckId === "string" &&
-    typeof (value as TruckDocumentItem).documentId === "string"
+    typeof (value as TruckDocumentItem).documentId === "string" &&
+    isApprovalStatus
   );
 }
 

@@ -39,6 +39,7 @@ function ApprovalDashboardPage() {
           res.map((item, index) => ({
             no: index + 1,
             truckId: item.truckId,
+            documentType: item.documentType,
             documentId: item.documentId,
             nickname: item.nickname ?? "-",
             phoneNumber: item.phoneNumber ?? "-",
@@ -62,13 +63,15 @@ function ApprovalDashboardPage() {
   return (
     <div className="bg-bg-app min-h-dvh w-full">
       <Header />
-      <div className="mx-auto w-full max-w-270 px-2 pt-24 pb-30">
+      <div className="mx-auto w-full max-w-270 px-2 pt-16 pb-30">
         <div className="flex justify-between">
           <h1 className="font-pretendard tracking-brand text-fg-primary mb-10 text-[24px] font-semibold">
             사업자 등록증 승인 관리
           </h1>
           <div className="flex gap-3">
-            <Button>검색 초기화</Button>
+            <Button onClick={() => setFilters(INITIAL_APPROVAL_FILTERS)}>
+              검색 초기화
+            </Button>
             <Button>조회</Button>
           </div>
         </div>
