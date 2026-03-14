@@ -77,7 +77,7 @@ function DateRangeField({
     <div className="flex items-center gap-3">
       <label
         htmlFor={startId}
-        className="font-pretendard tracking-brand text-ui-sm text-fg-secondary font-medium"
+        className="font-pretendard tracking-brand text-fg-secondary text-[16px] font-medium"
       >
         {label}
       </label>

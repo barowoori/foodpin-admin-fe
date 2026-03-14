@@ -1,6 +1,7 @@
 import ApprovalStatusSelect from "../ApprovalStatusSelect";
 import InputWrapper from "../InputWrapper";
 import type {
+  ApprovalStatus,
   ApprovalFilterPatch,
   ApprovalFilterState,
 } from "../../types/approval";
@@ -24,24 +25,22 @@ function SerachField({ value, onChange }: SerachFieldProps) {
       </InputWrapper>
 
       <InputWrapper>
-        <InputWrapper.Label htmlFor="phone">휴대폰번호</InputWrapper.Label>
+        <InputWrapper.Label htmlFor="phone-number">휴대폰번호</InputWrapper.Label>
         <InputWrapper.Input
-          id="phone"
+          id="phone-number"
           type="text"
-          value={value.phone}
-          onChange={(event) => onChange({ phone: event.target.value })}
+          value={value.phoneNumber}
+          onChange={(event) => onChange({ phoneNumber: event.target.value })}
         />
       </InputWrapper>
 
       <InputWrapper>
-        <InputWrapper.Label htmlFor="approval-status">
-          승인 상태
-        </InputWrapper.Label>
+        <InputWrapper.Label htmlFor="approval-status">승인 상태</InputWrapper.Label>
 
         <ApprovalStatusSelect
           id="approval-status"
-          value={value.approvalStatus}
-          onChange={(next) => onChange({ approvalStatus: next })}
+          value={value.status}
+          onChange={(next) => onChange({ status: next as ApprovalStatus })}
         />
       </InputWrapper>
     </div>
@@ -49,3 +48,4 @@ function SerachField({ value, onChange }: SerachFieldProps) {
 }
 
 export default SerachField;
+

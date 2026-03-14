@@ -16,10 +16,10 @@ function DateField({ value, onChange }: DateFieldProps) {
         label="요청일"
         startId="requested-date-start"
         endId="requested-date-end"
-        startDate={value.startAt}
-        endDate={value.endAt}
-        onStartDateChange={(next) => onChange({ startAt: next })}
-        onEndDateChange={(next) => onChange({ endAt: next })}
+        startDate={value.requestedStartAt}
+        endDate={value.requestedEndAt}
+        onStartDateChange={(next) => onChange({ requestedStartAt: next })}
+        onEndDateChange={(next) => onChange({ requestedEndAt: next })}
       />
       <DateRangeField
         label="처리일"
@@ -35,3 +35,4 @@ function DateField({ value, onChange }: DateFieldProps) {
 }
 
 export default DateField;
+

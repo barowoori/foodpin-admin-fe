@@ -9,7 +9,7 @@ function Label({ children, htmlFor }: LabelProps) {
   return (
     <label
       htmlFor={htmlFor}
-      className="font-pretendard tracking-brand text-ui-sm text-fg-secondary font-medium"
+      className="font-pretendard tracking-brand text-fg-secondary text-[16px] font-medium"
     >
       {children}
     </label>

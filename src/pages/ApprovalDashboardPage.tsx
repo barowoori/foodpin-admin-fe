@@ -1,36 +1,70 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import Button from "../components/Button";
+import ApprovalTable from "../components/approve/ApprovalTable";
 import DateField from "../components/approve/DateField";
 import SerachField from "../components/approve/SerachField";
 import type {
   ApprovalFilterPatch,
   ApprovalFilterState,
+  ApprovalTableRow,
 } from "../types/approval";
+import Header from "../components/Header";
+import { getList } from "../apis/truck";
 
 const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   nickname: "",
-  phone: "",
-  approvalStatus: "APPROVED",
-  startAt: "",
-  endAt: "",
+  phoneNumber: "",
+  status: "PENDING",
+  requestedStartAt: "",
+  requestedEndAt: "",
   processedStartAt: "",
   processedEndAt: "",
 };
 
 function ApprovalDashboardPage() {
-  const [approvalStatus, setApprovalStatus] = useState<ApprovalFilterState>(
+  const [filters, setFilters] = useState<ApprovalFilterState>(
     INITIAL_APPROVAL_FILTERS,
   );
+  const [items, setItems] = useState<ApprovalTableRow[]>([]);
 
   const handleFiltersChange = (patch: ApprovalFilterPatch) => {
-    setApprovalStatus((prev) => ({ ...prev, ...patch }));
+    setFilters((prev) => ({ ...prev, ...patch }));
   };
+
+  useEffect(() => {
+    const fetchList = async () => {
+      try {
+        const res = await getList();
+        setItems(
+          res.map((item, index) => ({
+            no: index + 1,
+            truckId: item.truckId,
+            documentId: item.documentId,
+            nickname: item.nickname ?? "-",
+            phoneNumber: item.phoneNumber ?? "-",
+            businessRegistrationNumber: item.businessRegistrationNumber,
+            representativeName: item.representativeName,
+            businessName: item.businessName,
+            openingDate: item.openingDate,
+            imageUrls: item.imageUrls ?? [],
+            status: item.status,
+            requestedAt: item.requestedAt,
+            processedAt: item.processedAt ?? "",
+          })),
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchList();
+  }, []);
 
   return (
     <div className="bg-bg-app min-h-dvh w-full">
-      <div className="mx-auto w-full max-w-268 px-8 pt-24">
+      <Header />
+      <div className="mx-auto w-full max-w-270 px-2 pt-24 pb-30">
         <div className="flex justify-between">
-          <h1 className="font-pretendard tracking-brand text-ui-title text-fg-primary mb-10 font-semibold">
+          <h1 className="font-pretendard tracking-brand text-fg-primary mb-10 text-[24px] font-semibold">
             사업자 등록증 승인 관리
           </h1>
           <div className="flex gap-3">
@@ -39,9 +73,11 @@ function ApprovalDashboardPage() {
           </div>
         </div>
 
-        <SerachField value={approvalStatus} onChange={handleFiltersChange} />
+        <SerachField value={filters} onChange={handleFiltersChange} />
 
-        <DateField value={approvalStatus} onChange={handleFiltersChange} />
+        <DateField value={filters} onChange={handleFiltersChange} />
+
+        <ApprovalTable items={items} totalCount={items.length} />
       </div>
     </div>
   );

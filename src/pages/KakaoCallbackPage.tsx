@@ -23,9 +23,22 @@ function KakaoCallbackPage() {
       try {
         const { accessToken, refreshToken } = await loginWithKakaoCode(code);
 
+        if (!accessToken || !refreshToken) {
+          throw new Error("토큰 수신에 실패했습니다.");
+        }
+
         if (!isCancelled) {
           setTokens(accessToken, refreshToken);
-          navigate("/dashboard", { replace: true });
+
+          const { accessToken: storedAccessToken, refreshToken: storedRefreshToken } =
+            useAuthStore.getState();
+
+          if (storedAccessToken && storedRefreshToken) {
+            navigate("/dashboard", { replace: true });
+            return;
+          }
+
+          throw new Error("토큰 저장에 실패했습니다.");
         }
       } catch {
         if (!isCancelled) {
