@@ -13,7 +13,7 @@ import { getList } from "../apis/truck";
 
 const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   nickname: "",
-  phoneNumber: "",
+  phone: "",
   status: "PENDING",
   requestedStartAt: "",
   requestedEndAt: "",
@@ -34,7 +34,7 @@ function ApprovalDashboardPage() {
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const res = await getList();
+        const res = await getList(filters);
         setItems(
           res.map((item, index) => ({
             no: index + 1,
@@ -42,7 +42,7 @@ function ApprovalDashboardPage() {
             documentType: item.documentType,
             documentId: item.documentId,
             nickname: item.nickname ?? "-",
-            phoneNumber: item.phoneNumber ?? "-",
+            phone: item.phone ?? "-",
             businessRegistrationNumber: item.businessRegistrationNumber,
             representativeName: item.representativeName,
             businessName: item.businessName,
@@ -57,8 +57,9 @@ function ApprovalDashboardPage() {
         console.log(error);
       }
     };
-    fetchList();
-  }, []);
+
+    void fetchList();
+  }, [filters]);
 
   return (
     <div className="bg-bg-app min-h-dvh w-full">

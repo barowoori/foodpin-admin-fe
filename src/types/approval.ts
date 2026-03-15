@@ -2,7 +2,7 @@ export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface ApprovalFilterState {
   nickname: string;
-  phoneNumber: string;
+  phone: string;
   status: ApprovalStatus;
   requestedStartAt: string;
   requestedEndAt: string;
@@ -18,7 +18,7 @@ export interface ApprovalTableRow {
   documentType: string;
   documentId: string;
   nickname: string;
-  phoneNumber: string;
+  phone: string;
   businessRegistrationNumber: string;
   representativeName: string;
   businessName: string;

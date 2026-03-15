@@ -33,9 +33,9 @@ function SerachField({ value, onChange }: SerachFieldProps) {
           type="tel"
           inputMode="numeric"
           pattern="[0-9]*"
-          value={value.phoneNumber}
+          value={value.phone}
           onChange={(event) =>
-            onChange({ phoneNumber: event.target.value.replace(/\D/g, "") })
+            onChange({ phone: event.target.value.replace(/\D/g, "") })
           }
         />
       </InputWrapper>

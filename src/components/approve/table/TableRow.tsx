@@ -47,7 +47,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
     <>
       <span>{item.no}</span>
       <span>{item.nickname}</span>
-      <span>{item.phoneNumber}</span>
+      <span>{item.phone}</span>
       <span>
         {formatBusinessRegistrationNumber(item.businessRegistrationNumber)}
       </span>
