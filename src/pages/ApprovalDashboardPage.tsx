@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Button from "../components/Button";
 import ApprovalTable from "../components/approve/ApprovalTable";
 import DateField from "../components/approve/DateField";
@@ -14,7 +15,7 @@ import { getList } from "../apis/truck";
 const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   nickname: "",
   phone: "",
-  status: "PENDING",
+  status: "",
   requestedStartAt: "",
   requestedEndAt: "",
   processedStartAt: "",
@@ -25,41 +26,39 @@ function ApprovalDashboardPage() {
   const [filters, setFilters] = useState<ApprovalFilterState>(
     INITIAL_APPROVAL_FILTERS,
   );
-  const [items, setItems] = useState<ApprovalTableRow[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState<ApprovalFilterState>(
+    INITIAL_APPROVAL_FILTERS,
+  );
 
   const handleFiltersChange = (patch: ApprovalFilterPatch) => {
     setFilters((prev) => ({ ...prev, ...patch }));
   };
 
-  useEffect(() => {
-    const fetchList = async () => {
-      try {
-        const res = await getList(filters);
-        setItems(
-          res.map((item, index) => ({
-            no: index + 1,
-            truckId: item.truckId,
-            documentType: item.documentType,
-            documentId: item.documentId,
-            nickname: item.nickname ?? "-",
-            phone: item.phone ?? "-",
-            businessRegistrationNumber: item.businessRegistrationNumber,
-            representativeName: item.representativeName,
-            businessName: item.businessName,
-            openingDate: item.openingDate,
-            imageUrls: item.imageUrls ?? [],
-            status: item.status,
-            requestedAt: item.requestedAt,
-            processedAt: item.processedAt ?? "",
-          })),
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const { data = [], isFetching } = useQuery({
+    queryKey: ["truck-document-list", appliedFilters],
+    queryFn: () => getList(appliedFilters),
+  });
 
-    void fetchList();
-  }, [filters]);
+  const items = useMemo<ApprovalTableRow[]>(
+    () =>
+      data.map((item, index) => ({
+        no: index + 1,
+        truckId: item.truckId,
+        documentType: item.documentType,
+        documentId: item.documentId,
+        nickname: item.nickname ?? "-",
+        phone: item.phone ?? "-",
+        businessRegistrationNumber: item.businessRegistrationNumber,
+        representativeName: item.representativeName,
+        businessName: item.businessName,
+        openingDate: item.openingDate,
+        imageUrls: item.imageUrls ?? [],
+        status: item.status,
+        requestedAt: item.requestedAt,
+        processedAt: item.processedAt ?? "",
+      })),
+    [data],
+  );
 
   return (
     <div className="bg-bg-app min-h-dvh w-full">
@@ -70,10 +69,20 @@ function ApprovalDashboardPage() {
             사업자 등록증 승인 관리
           </h1>
           <div className="flex gap-3">
-            <Button onClick={() => setFilters(INITIAL_APPROVAL_FILTERS)}>
+            <Button
+              onClick={() => {
+                setFilters(INITIAL_APPROVAL_FILTERS);
+                setAppliedFilters(INITIAL_APPROVAL_FILTERS);
+              }}
+            >
               검색 초기화
             </Button>
-            <Button>조회</Button>
+            <Button
+              disabled={isFetching}
+              onClick={() => setAppliedFilters({ ...filters })}
+            >
+              조회
+            </Button>
           </div>
         </div>
 

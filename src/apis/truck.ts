@@ -1,4 +1,4 @@
-import api from ".";
+﻿import api from ".";
 import type { TruckDocumentItem } from "../types/truck";
 
 type TruckDocumentPageData = {
@@ -14,7 +14,7 @@ type TruckDocumentListResponse = {
 type TruckDocumentListParams = {
   nickname?: string;
   phone?: string;
-  status?: "PENDING" | "APPROVED" | "REJECTED";
+  status?: "" | "PENDING" | "APPROVED" | "REJECTED";
   requestedStartAt?: string;
   requestedEndAt?: string;
   processedStartAt?: string;

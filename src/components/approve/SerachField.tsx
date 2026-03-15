@@ -1,7 +1,6 @@
-import ApprovalStatusSelect from "../ApprovalStatusSelect";
+﻿import ApprovalStatusSelect from "../ApprovalStatusSelect";
 import InputWrapper from "../InputWrapper";
 import type {
-  ApprovalStatus,
   ApprovalFilterPatch,
   ApprovalFilterState,
 } from "../../types/approval";
@@ -42,13 +41,15 @@ function SerachField({ value, onChange }: SerachFieldProps) {
 
       <InputWrapper>
         <InputWrapper.Label htmlFor="approval-status">
-          승인 상태
+          승인상태
         </InputWrapper.Label>
 
         <ApprovalStatusSelect
           id="approval-status"
           value={value.status}
-          onChange={(next) => onChange({ status: next as ApprovalStatus })}
+          onChange={(next) =>
+            onChange({ status: next as ApprovalFilterState["status"] })
+          }
         />
       </InputWrapper>
     </div>

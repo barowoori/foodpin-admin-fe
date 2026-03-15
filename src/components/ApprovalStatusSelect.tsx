@@ -1,4 +1,4 @@
-import ArrowIcon from "../assets/arrow.svg?react";
+﻿import ArrowIcon from "../assets/arrow.svg?react";
 
 type SelectOption = {
   value: string;
@@ -6,6 +6,7 @@ type SelectOption = {
 };
 
 const APPROVAL_STATUS_OPTIONS: SelectOption[] = [
+  { value: "", label: "--" },
   { value: "PENDING", label: "대기" },
   { value: "APPROVED", label: "승인" },
   { value: "REJECTED", label: "반려" },
@@ -46,4 +47,3 @@ function ApprovalStatusSelect({
 }
 
 export default ApprovalStatusSelect;
-

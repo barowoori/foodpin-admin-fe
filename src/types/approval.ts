@@ -1,9 +1,10 @@
-export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+﻿export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "";
+export type ApprovalFilterStatus = ApprovalStatus | "";
 
 export interface ApprovalFilterState {
   nickname: string;
   phone: string;
-  status: ApprovalStatus;
+  status: ApprovalFilterStatus;
   requestedStartAt: string;
   requestedEndAt: string;
   processedStartAt: string;
