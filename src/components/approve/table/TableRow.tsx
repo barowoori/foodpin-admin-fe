@@ -2,7 +2,7 @@ import type { ApprovalStatus, ApprovalTableRow } from "../../../types/approval";
 import { formatDateTime } from "../../../utils/formatDateTime";
 
 const STATUS_LABEL: Record<ApprovalStatus, string> = {
-  PENDING: "대기",
+  PENDING: "승인대기",
   APPROVED: "승인",
   REJECTED: "반려",
 };
@@ -64,10 +64,13 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
       <span className="whitespace-pre-line">
         {formatDateTime(item.processedAt)}
       </span>
-      <span className="flex w-full min-w-0 flex-row gap-1">
-        <ActionButton label="승인" />
-        <ActionButton label="반려" />
-      </span>
+
+      {STATUS_LABEL[item.status] === "승인대기" && (
+        <span className="flex w-full min-w-0 flex-row gap-1">
+          <ActionButton label="승인" />
+          <ActionButton label="반려" />
+        </span>
+      )}
     </>
   );
 }
