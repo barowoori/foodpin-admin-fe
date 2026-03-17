@@ -9,7 +9,7 @@ import type {
   ApprovalFilterState,
   ApprovalTableRow,
 } from "../types/approval";
-import Header from "../components/Header";
+import Header from "../shared/Header";
 import { getList } from "../apis/truck";
 
 const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
@@ -20,6 +20,8 @@ const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   requestedEndAt: "",
   processedStartAt: "",
   processedEndAt: "",
+  page: 0,
+  size: 10,
 };
 
 function ApprovalDashboardPage() {
@@ -34,20 +36,30 @@ function ApprovalDashboardPage() {
     setFilters((prev) => ({ ...prev, ...patch }));
   };
 
-  const { data = [], isFetching } = useQuery({
+  const handlePageSizeChange = (nextSize: number) => {
+    setFilters((prev) => ({ ...prev, page: 0, size: nextSize }));
+    setAppliedFilters((prev) => ({ ...prev, page: 0, size: nextSize }));
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setFilters((prev) => ({ ...prev, page: nextPage }));
+    setAppliedFilters((prev) => ({ ...prev, page: nextPage }));
+  };
+
+  const { data, isFetching } = useQuery({
     queryKey: ["truck-document-list", appliedFilters],
     queryFn: () => getList(appliedFilters),
   });
 
   const items = useMemo<ApprovalTableRow[]>(
     () =>
-      data.map((item, index) => ({
-        no: index + 1,
+      (data?.content ?? []).map((item, index) => ({
+        no: appliedFilters.page * appliedFilters.size + index + 1,
         truckId: item.truckId,
         documentType: item.documentType,
         documentId: item.documentId,
         nickname: item.nickname ?? "-",
-        phone: item.phone ?? "-",
+        phone: item.phoneNumber ?? item.phone ?? "-",
         businessRegistrationNumber: item.businessRegistrationNumber,
         representativeName: item.representativeName,
         businessName: item.businessName,
@@ -57,7 +69,7 @@ function ApprovalDashboardPage() {
         requestedAt: item.requestedAt,
         processedAt: item.processedAt ?? "",
       })),
-    [data],
+    [appliedFilters.page, appliedFilters.size, data?.content],
   );
 
   return (
@@ -79,7 +91,10 @@ function ApprovalDashboardPage() {
             </Button>
             <Button
               disabled={isFetching}
-              onClick={() => setAppliedFilters({ ...filters })}
+              onClick={() => {
+                setFilters((prev) => ({ ...prev, page: 0 }));
+                setAppliedFilters({ ...filters, page: 0 });
+              }}
             >
               조회
             </Button>
@@ -90,7 +105,16 @@ function ApprovalDashboardPage() {
 
         <DateField value={filters} onChange={handleFiltersChange} />
 
-        <ApprovalTable items={items} totalCount={items.length} />
+        <ApprovalTable
+          items={items}
+          totalCount={data?.totalElements ?? 0}
+          pageSize={appliedFilters.size}
+          onPageSizeChange={handlePageSizeChange}
+          totalPages={data?.totalPages ?? 0}
+          currentPage={data?.page ?? appliedFilters.page}
+          onPageChange={handlePageChange}
+          isFetching={isFetching}
+        />
       </div>
     </div>
   );

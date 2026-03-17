@@ -7,7 +7,7 @@ type SelectOption = {
 
 const APPROVAL_STATUS_OPTIONS: SelectOption[] = [
   { value: "", label: "--" },
-  { value: "PENDING", label: "대기" },
+  { value: "PENDING", label: "승인대기" },
   { value: "APPROVED", label: "승인" },
   { value: "REJECTED", label: "반려" },
 ];

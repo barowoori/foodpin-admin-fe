@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { getInfo, type MemberInfo } from "../apis/auth";
 import { useAuthStore } from "../stores/authStore";
 
@@ -10,7 +10,6 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const nickname = info?.nickname ?? "Admin";
   const fallbackInitial = nickname.slice(0, 1);
-  const logoutLabel = "\uB85C\uADF8\uC544\uC6C3";
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -34,10 +33,25 @@ function Header() {
   return (
     <header className="border-border-control/70 bg-bg-control/90 text-fg-primary sticky top-0 z-20 w-full border-b backdrop-blur">
       <div className="mx-auto flex w-full max-w-270 items-center justify-between px-2 py-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-10">
           <span className="font-pretendard tracking-brand text-ui-base leading-none font-semibold">
             Foodpin Admin
           </span>
+
+          <div className="flex items-center gap-2">
+            <Link
+              to="/business"
+              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            >
+              사업자등록 관리
+            </Link>
+            <Link
+              to="/events"
+              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            >
+              행사 관리
+            </Link>
+          </div>
         </div>
 
         <div
@@ -78,7 +92,7 @@ function Header() {
               onClick={handleLogout}
               className="hover:bg-bg-app w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm text-red-500"
             >
-              {logoutLabel}
+              로그아웃
             </button>
           </div>
         </div>

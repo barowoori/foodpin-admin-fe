@@ -1,4 +1,7 @@
-﻿import { useState } from "react";
+﻿import NextIcon from "../../assets/next.svg?react";
+import NextDoubleIcon from "../../assets/nextx.svg?react";
+import PrevIcon from "../../assets/prev.svg?react";
+import PrevDoubleIcon from "../../assets/prevx.svg?react";
 import ApprovalStatusSelect from "../ApprovalStatusSelect";
 import type { ApprovalTableRow } from "../../types/approval";
 import TableHeaderWrapper from "./table/TableHeaderWrapper";
@@ -11,17 +14,38 @@ const TABLE_GRID_CLASS =
 type ApprovalTableProps = {
   items: ApprovalTableRow[];
   totalCount?: number;
+  pageSize: number;
+  onPageSizeChange: (next: number) => void;
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (nextPage: number) => void;
+  isFetching?: boolean;
 };
 
 function ApprovalTable({
   items,
   totalCount = items.length,
+  pageSize,
+  onPageSizeChange,
+  totalPages,
+  currentPage,
+  onPageChange,
+  isFetching = false,
 }: ApprovalTableProps) {
-  const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = PAGE_SIZE_OPTIONS.map((option) => ({
     value: String(option),
     label: String(option),
   }));
+
+  const pageNumbers = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  );
+  const isFirstPage = currentPage <= 0;
+  const isLastPage = totalPages <= 0 || currentPage >= totalPages - 1;
+
+  const baseNavButtonClass =
+    "inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors [&_path]:fill-fg-muted hover:[&_path]:fill-fg-primary disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <section className="mt-16">
@@ -29,7 +53,7 @@ function ApprovalTable({
         <span>총 {totalCount}건</span>
         <ApprovalStatusSelect
           value={String(pageSize)}
-          onChange={(next) => setPageSize(Number(next))}
+          onChange={(next) => onPageSizeChange(Number(next))}
           options={pageSizeOptions}
           widthClassName="w-24"
         />
@@ -63,6 +87,71 @@ function ApprovalTable({
           </div>
         ))}
       </div>
+
+      {totalPages > 0 && (
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-1 text-[28px]">
+          <button
+            type="button"
+            className={baseNavButtonClass}
+            disabled={isFirstPage || isFetching}
+            onClick={() => onPageChange(0)}
+            aria-label="첫 페이지"
+          >
+            <PrevDoubleIcon className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            className={baseNavButtonClass}
+            disabled={isFirstPage || isFetching}
+            onClick={() => onPageChange(currentPage - 1)}
+            aria-label="이전 페이지"
+          >
+            <PrevIcon className="h-4 w-4" />
+          </button>
+
+          {pageNumbers.map((pageNumber) => {
+            const isActive = currentPage === pageNumber - 1;
+
+            return (
+              <button
+                type="button"
+                key={pageNumber}
+                className={`h-10 min-w-10 rounded-lg border px-2 text-[20px] leading-none font-semibold transition-colors ${
+                  isActive
+                    ? "border-border-control bg-bg-control text-fg-primary"
+                    : "text-fg-muted hover:border-border-control/60 hover:bg-bg-control/70 hover:text-fg-primary border-transparent"
+                }`}
+                disabled={isFetching}
+                onClick={() => onPageChange(pageNumber - 1)}
+                aria-current={isActive ? "page" : undefined}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            className={baseNavButtonClass}
+            disabled={isLastPage || isFetching}
+            onClick={() => onPageChange(currentPage + 1)}
+            aria-label="다음 페이지"
+          >
+            <NextIcon className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            className={baseNavButtonClass}
+            disabled={isLastPage || isFetching}
+            onClick={() => onPageChange(totalPages - 1)}
+            aria-label="마지막 페이지"
+          >
+            <NextDoubleIcon className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }

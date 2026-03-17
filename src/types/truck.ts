@@ -4,7 +4,8 @@ export interface TruckDocumentItem {
   truckId: string;
   documentType: string;
   nickname: string | null;
-  phone: string | null;
+  phoneNumber?: string | null;
+  phone?: string | null;
   businessRegistrationNumber: string;
   representativeName: string;
   businessName: string;
@@ -15,3 +16,12 @@ export interface TruckDocumentItem {
   processedAt: string | null;
   documentId: string;
 }
+
+export type TruckDocumentTarget = Pick<
+  TruckDocumentItem,
+  "truckId" | "documentType"
+>;
+
+export type TruckDocumentRejectPayload = TruckDocumentTarget & {
+  rejectionReason: string;
+};

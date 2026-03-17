@@ -9,6 +9,8 @@ export interface ApprovalFilterState {
   requestedEndAt: string;
   processedStartAt: string;
   processedEndAt: string;
+  page: number;
+  size: number;
 }
 
 export type ApprovalFilterPatch = Partial<ApprovalFilterState>;
