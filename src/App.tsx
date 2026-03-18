@@ -6,6 +6,7 @@ import {
   KakaoCallbackPage,
   LoginPage,
 } from "./pages";
+import EventFormPage from "./pages/EventFormPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="business" element={<ApprovalDashboardPage />} />
         <Route path="events" element={<EventManagementPage />} />
+        <Route path="events/form" element={<EventFormPage />} />
       </Routes>
     </BrowserRouter>
   );

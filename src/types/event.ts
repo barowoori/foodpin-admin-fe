@@ -61,3 +61,55 @@ export interface EventFilterState {
 }
 
 export type EventFilterPatch = Partial<EventFilterState>;
+
+export type EventType =
+  | "CORPORATE"
+  | "PERSONAL"
+  | "SCHOOL"
+  | "LOCAL"
+  | "APARTMENT_MARKET"
+  | "CELEBRITY_SUPPORT";
+
+export type ExpectedParticipants =
+  | "UNDECIDED"
+  | "UNDER_50"
+  | "UNDER_100"
+  | "UNDER_150"
+  | "UNDER_200"
+  | "OVER_200";
+
+export type EventDateDto = Record<string, unknown>;
+
+export interface BaseInfoState {
+  name: string;
+  type: EventType;
+  expectedParticipants: ExpectedParticipants;
+  fileIdList?: string[];
+  regionCode: string;
+  eventDateDtoList: EventDateDto[];
+  recruitmentUrl: string;
+}
+
+export type EventDateMode = "DATE" | "PERIOD";
+
+export interface EventDateTime {
+  startTime: string;
+  endTime: string;
+}
+
+export interface BaseInfoFormState {
+  name: string;
+  type: EventType | "";
+  expectedParticipants: ExpectedParticipants;
+  fileIdList: string[];
+  photoFiles: File[];
+  regionDo: string;
+  regionSi: string;
+  recruitmentUrl: string;
+  eventDateMode: EventDateMode;
+  selectedDates: string[];
+  periodStartDate: string;
+  periodEndDate: string;
+  applyTimeToAll: boolean;
+  periodTimeByDate: Record<string, EventDateTime>;
+}

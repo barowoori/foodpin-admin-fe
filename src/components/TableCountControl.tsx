@@ -1,4 +1,4 @@
-import ApprovalStatusSelect from "./ApprovalStatusSelect";
+﻿import FormSelect from "./FormSelect";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
@@ -25,7 +25,7 @@ function TableCountControl({
       className={`font-pretendard text-fg-primary flex items-center gap-2 text-[16px] ${className}`.trim()}
     >
       <span>총 {totalCount}건</span>
-      <ApprovalStatusSelect
+      <FormSelect
         value={String(pageSize)}
         onChange={(next) => onPageSizeChange(Number(next))}
         options={pageSizeOptions}
@@ -37,3 +37,4 @@ function TableCountControl({
 }
 
 export default TableCountControl;
+

@@ -1,4 +1,4 @@
-import { ApprovalStatusSelect, InputWrapper } from "../../components";
+﻿import { FormSelect, InputWrapper } from "../../components";
 import type { EventFilterPatch, EventFilterState } from "../../types";
 
 type SelectOption = {
@@ -37,14 +37,14 @@ function EventSearchField({
         </span>
 
         <div className="flex items-end gap-4">
-          <ApprovalStatusSelect
+          <FormSelect
             value={value.regionDo}
             onChange={(next) => onChange({ regionDo: next, regionSi: "" })}
             options={regionDoOptions}
             widthClassName="w-34"
           />
 
-          <ApprovalStatusSelect
+          <FormSelect
             value={value.regionSi}
             onChange={(next) => onChange({ regionSi: next })}
             options={regionSiOptions}
@@ -57,3 +57,4 @@ function EventSearchField({
 }
 
 export default EventSearchField;
+
