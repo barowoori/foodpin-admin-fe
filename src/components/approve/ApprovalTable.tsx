@@ -1,11 +1,11 @@
-﻿import NextIcon from "../../assets/next.svg?react";
+import NextIcon from "../../assets/next.svg?react";
 import NextDoubleIcon from "../../assets/nextx.svg?react";
 import PrevIcon from "../../assets/prev.svg?react";
 import PrevDoubleIcon from "../../assets/prevx.svg?react";
-import ApprovalStatusSelect from "../ApprovalStatusSelect";
-import type { ApprovalTableRow } from "../../types/approval";
-import TableHeaderWrapper from "./table/TableHeaderWrapper";
-import TableRow from "./table/TableRow";
+import { ApprovalStatusSelect } from "../../components";
+import type { ApprovalTableRow } from "../../types";
+import { TableHeaderWrapper } from "./table";
+import { TableRow } from "./table";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 const TABLE_GRID_CLASS =
@@ -157,3 +157,4 @@ function ApprovalTable({
 }
 
 export default ApprovalTable;
+

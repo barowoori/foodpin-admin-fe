@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
-import KakaoCallbackPage from "./pages/KakaoCallbackPage";
-import LoginPage from "./pages/LoginPage";
-import ApprovalDashboardPage from "./pages/ApprovalDashboardPage";
-import EventManagementPage from "./pages/EventManagementPage";
+import {
+  ApprovalDashboardPage,
+  EventManagementPage,
+  KakaoCallbackPage,
+  LoginPage,
+} from "./pages";
 
 function App() {
   return (

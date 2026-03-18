@@ -1,16 +1,13 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Button from "../components/Button";
-import ApprovalTable from "../components/approve/ApprovalTable";
-import DateField from "../components/approve/DateField";
-import SerachField from "../components/approve/SerachField";
+import { ApprovalTable, Button, DateField, SerachField } from "../components";
 import type {
   ApprovalFilterPatch,
   ApprovalFilterState,
   ApprovalTableRow,
-} from "../types/approval";
-import Header from "../shared/Header";
-import { getList } from "../apis/truck";
+} from "../types";
+import { Header } from "../shared";
+import { getList } from "../apis";
 
 const INITIAL_APPROVAL_FILTERS: ApprovalFilterState = {
   nickname: "",
@@ -66,6 +63,7 @@ function ApprovalDashboardPage() {
         openingDate: item.openingDate,
         imageUrls: item.imageUrls ?? [],
         status: item.status,
+        rejectionReason: item.rejectionReason ?? null,
         requestedAt: item.requestedAt,
         processedAt: item.processedAt ?? "",
       })),

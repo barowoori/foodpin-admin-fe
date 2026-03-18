@@ -1,9 +1,9 @@
-﻿import api from ".";
+import api from ".";
 import type {
   TruckDocumentItem,
   TruckDocumentRejectPayload,
   TruckDocumentTarget,
-} from "../types/truck";
+} from "../types";
 
 type TruckDocumentPageData = {
   totalElements?: number | null;
@@ -149,3 +149,4 @@ export const rejectTruckDocument = async ({
 
   return res;
 };
+

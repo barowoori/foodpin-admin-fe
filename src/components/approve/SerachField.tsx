@@ -1,9 +1,9 @@
-﻿import ApprovalStatusSelect from "../ApprovalStatusSelect";
-import InputWrapper from "../InputWrapper";
+import { ApprovalStatusSelect } from "../../components";
+import { InputWrapper } from "../../components";
 import type {
   ApprovalFilterPatch,
   ApprovalFilterState,
-} from "../../types/approval";
+} from "../../types";
 
 type SerachFieldProps = {
   value: ApprovalFilterState;
@@ -57,3 +57,4 @@ function SerachField({ value, onChange }: SerachFieldProps) {
 }
 
 export default SerachField;
+

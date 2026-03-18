@@ -3,7 +3,7 @@ import axios, {
   AxiosHeaders,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "../stores";
 
 const BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
@@ -125,3 +125,7 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export * from "./auth";
+export * from "./truck";
+export * from "./event";

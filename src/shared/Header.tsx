@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { getInfo, type MemberInfo } from "../apis/auth";
-import { useAuthStore } from "../stores/authStore";
+import { getInfo, type MemberInfo } from "../apis";
+import { useAuthStore } from "../stores";
 
 function Header() {
   const navigate = useNavigate();
@@ -43,14 +43,12 @@ function Header() {
               to="/business"
               className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             >
-              사업자등록 관리
-            </Link>
+              ?ъ뾽?먮벑濡?愿由?            </Link>
             <Link
               to="/events"
               className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             >
-              행사 관리
-            </Link>
+              ?됱궗 愿由?            </Link>
           </div>
         </div>
 
@@ -92,7 +90,7 @@ function Header() {
               onClick={handleLogout}
               className="hover:bg-bg-app w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm text-red-500"
             >
-              로그아웃
+              濡쒓렇?꾩썐
             </button>
           </div>
         </div>
@@ -102,3 +100,4 @@ function Header() {
 }
 
 export default Header;
+

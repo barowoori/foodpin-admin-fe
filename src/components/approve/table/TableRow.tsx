@@ -1,14 +1,14 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { approveTruckDocument, rejectTruckDocument } from "../../../apis/truck";
-import type { ApprovalStatus, ApprovalTableRow } from "../../../types/approval";
+import { approveTruckDocument, rejectTruckDocument } from "../../../apis";
+import type { ApprovalStatus, ApprovalTableRow } from "../../../types";
 import type {
   TruckDocumentRejectPayload,
   TruckDocumentTarget,
-} from "../../../types/truck";
-import Modal from "../../../shared/Modal";
-import { formatDateTime } from "../../../utils/formatDateTime";
-import Button from "../../Button";
+} from "../../../types";
+import { Modal } from "../../../shared";
+import { formatDateTime } from "../../../utils";
+import { Button } from "../../../components";
 
 const STATUS_LABEL: Record<ApprovalStatus, string> = {
   PENDING: "승인대기",
@@ -132,10 +132,15 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
                 </div>
                 <div className="bg-bg-control px-3 py-3">
                   <textarea
-                    value={rejectionReason}
+                    value={
+                      item.rejectionReason !== null
+                        ? item.rejectionReason
+                        : rejectionReason
+                    }
                     onChange={(event) =>
                       setRejectionReason(event.target.value.slice(0, 20))
                     }
+                    disabled={item.rejectionReason !== null}
                     maxLength={20}
                     placeholder="반려 사유를 입력하세요"
                     className="border-border-control bg-bg-app text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-56 w-full resize-none border px-4 py-3 text-[16px] leading-6 outline-none focus:ring-2"
@@ -145,23 +150,35 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
             </div>
 
             <Modal.ButtonLayout className="mt-7 gap-4 px-0 pb-0">
-              <Button
-                onClick={() => {
-                  void handleReject({
-                    truckId: item.truckId,
-                    documentType: item.documentType,
-                    rejectionReason,
-                  });
-                }}
-              >
-                등록
-              </Button>
-              <Modal.Cancled
-                onClick={() => setIsRejectModalOpen(false)}
-                className="border-border-control bg-bg-app text-fg-secondary hover:bg-bg-control mt-0 h-11 min-w-44 px-8 text-[18px] font-semibold"
-              >
-                취소
-              </Modal.Cancled>
+              {item.rejectionReason !== null ? (
+                <Button
+                  onClick={() => {
+                    setIsRejectModalOpen(false);
+                  }}
+                >
+                  닫기
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => {
+                      void handleReject({
+                        truckId: item.truckId,
+                        documentType: item.documentType,
+                        rejectionReason,
+                      });
+                    }}
+                  >
+                    등록
+                  </Button>
+                  <Modal.Cancled
+                    onClick={() => setIsRejectModalOpen(false)}
+                    className="border-border-control bg-bg-app text-fg-secondary hover:bg-bg-control mt-0 h-11 min-w-44 px-8 text-[18px] font-semibold"
+                  >
+                    취소
+                  </Modal.Cancled>
+                </>
+              )}
             </Modal.ButtonLayout>
           </div>
         </Modal>
@@ -185,7 +202,12 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
       ) : (
         "-"
       )}
-      <span className={STATUS_CLASS[item.status]}>
+      <span
+        className={`${STATUS_CLASS[item.status]} ${item.status === "REJECTED" ? "cursor-pointer" : ""}`}
+        onClick={() => {
+          setIsRejectModalOpen(true);
+        }}
+      >
         {STATUS_LABEL[item.status]}
       </span>
       <span className="whitespace-pre-line">
@@ -222,3 +244,4 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
 }
 
 export default TableRow;
+

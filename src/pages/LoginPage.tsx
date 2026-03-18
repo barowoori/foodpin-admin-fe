@@ -1,6 +1,6 @@
-﻿import KakakoImg from "../assets/kakako.png";
+import KakakoImg from "../assets/kakako.png";
 import LoginImg from "../assets/loginImg.png";
-import { getKakaoLoginUrl } from "../apis/auth";
+import { getKakaoLoginUrl } from "../apis";
 
 function LoginPage() {
   const handleKakaoLogin = () => {

@@ -1,6 +1,6 @@
-﻿import { createPortal } from "react-dom";
+import { createPortal } from "react-dom";
 import { useEffect, type ReactNode } from "react";
-import Button from "../components/Button";
+import { Button } from "../components";
 
 interface ModalProps {
   children?: ReactNode;
@@ -99,3 +99,4 @@ const Modal = Object.assign(ModalMain, {
 });
 
 export default Modal;
+

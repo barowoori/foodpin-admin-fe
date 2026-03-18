@@ -12,6 +12,7 @@ export interface TruckDocumentItem {
   openingDate: string;
   imageUrls: string[];
   status: ApprovalStatus;
+  rejectionReason?: string | null;
   requestedAt: string;
   processedAt: string | null;
   documentId: string;

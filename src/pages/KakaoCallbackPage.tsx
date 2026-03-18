@@ -1,7 +1,7 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { loginWithKakaoCode } from "../apis/auth";
-import { useAuthStore } from "../stores/authStore";
+import { loginWithKakaoCode } from "../apis";
+import { useAuthStore } from "../stores";
 
 function KakaoCallbackPage() {
   const navigate = useNavigate();
@@ -30,11 +30,13 @@ function KakaoCallbackPage() {
         if (!isCancelled) {
           setTokens(accessToken, refreshToken);
 
-          const { accessToken: storedAccessToken, refreshToken: storedRefreshToken } =
-            useAuthStore.getState();
+          const {
+            accessToken: storedAccessToken,
+            refreshToken: storedRefreshToken,
+          } = useAuthStore.getState();
 
           if (storedAccessToken && storedRefreshToken) {
-            navigate("/dashboard", { replace: true });
+            navigate("/business", { replace: true });
             return;
           }
 

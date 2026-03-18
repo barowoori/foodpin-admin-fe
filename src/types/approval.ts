@@ -28,6 +28,7 @@ export interface ApprovalTableRow {
   openingDate: string;
   imageUrls: string[];
   status: ApprovalStatus;
+  rejectionReason: string | null;
   requestedAt: string;
   processedAt: string;
 }
