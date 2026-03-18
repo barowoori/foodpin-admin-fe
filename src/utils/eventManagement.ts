@@ -1,7 +1,13 @@
 import doCsvRaw from "../data/do.csv?raw";
 import siCsvRaw from "../data/si.csv?raw";
+import guCsvRaw from "../data/gu.csv?raw";
+import gunCsvRaw from "../data/gun.csv?raw";
 import type { EventListParams } from "../apis";
-import type { EventFilterState, EventListResult, EventTableRow } from "../types";
+import type {
+  EventFilterState,
+  EventListResult,
+  EventTableRow,
+} from "../types";
 
 type CsvRow = Record<string, string>;
 
@@ -42,24 +48,34 @@ function toDoCode(id: string) {
   return `DO${id}`;
 }
 
-function toLowestRegionCode(id: string, regionName: string) {
-  const name = regionName.trim();
-
-  if (name.endsWith("\uAD6C")) {
-    return `GU${id}`;
-  }
-
-  if (name.endsWith("\uAD70")) {
-    return `GUN${id}`;
-  }
-
+function toSiCode(id: string) {
   return `SI${id}`;
+}
+
+function toGuCode(id: string) {
+  return `GU${id}`;
+}
+
+function toGunCode(id: string) {
+  return `GUN${id}`;
+}
+
+function normalizeDoLabel(name: string) {
+  return name
+    .replace("특별자치도", "")
+    .replace("특별자치시", "")
+    .replace("특별시", "")
+    .replace("광역시", "")
+    .replace(/도$/, "");
 }
 
 function createRegionOptions() {
   const doRows = parseCsvRows(doCsvRaw);
   const siRows = parseCsvRows(siCsvRaw);
+  const guRows = parseCsvRows(guCsvRaw);
+  const gunRows = parseCsvRows(gunCsvRaw);
   const doCodeById = new Map<string, string>();
+  const parentDoCodeBySiId = new Map<string, string>();
   const regionDoOptions: RegionSelectOption[] = [{ ...SELECT_ALL_OPTION }];
   const regionSiOptionsMap: Record<string, RegionSelectOption[]> = {
     "": [{ ...SELECT_ALL_OPTION }],
@@ -79,7 +95,10 @@ function createRegionOptions() {
     }
 
     seenDoCodes.add(regionCode);
-    regionDoOptions.push({ value: regionCode, label: regionName });
+    regionDoOptions.push({
+      value: regionCode,
+      label: normalizeDoLabel(regionName),
+    });
     ensureRegionKey(regionCode);
   };
 
@@ -114,18 +133,44 @@ function createRegionOptions() {
   });
 
   siRows.forEach((row) => {
-    const regionCode = toLowestRegionCode(row.id, row.name);
-
-    addSiOption("", row.name, regionCode);
+    const siCode = toSiCode(row.id);
 
     if (!row.region_do_id) {
-      addDoOption(row.name, regionCode);
+      addDoOption(row.name, siCode);
+      parentDoCodeBySiId.set(row.id, siCode);
       return;
     }
 
     const parentCode = doCodeById.get(row.region_do_id);
     if (parentCode) {
-      addSiOption(parentCode, row.name, regionCode);
+      parentDoCodeBySiId.set(row.id, parentCode);
+      addSiOption(parentCode, row.name, siCode);
+    }
+  });
+
+  guRows.forEach((row) => {
+    const guCode = toGuCode(row.id);
+    const parentCode = row.region_do_id
+      ? doCodeById.get(row.region_do_id)
+      : row.region_si_id
+        ? parentDoCodeBySiId.get(row.region_si_id)
+        : undefined;
+
+    if (parentCode) {
+      addSiOption(parentCode, row.name, guCode);
+    }
+  });
+
+  gunRows.forEach((row) => {
+    const gunCode = toGunCode(row.id);
+    const parentCode = row.region_do_id
+      ? doCodeById.get(row.region_do_id)
+      : row.region_si_id
+        ? parentDoCodeBySiId.get(row.region_si_id)
+        : undefined;
+
+    if (parentCode) {
+      addSiOption(parentCode, row.name, gunCode);
     }
   });
 
@@ -223,4 +268,3 @@ export function mapEventTableRows(
     };
   });
 }
-

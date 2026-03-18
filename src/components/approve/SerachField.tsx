@@ -1,13 +1,17 @@
 ﻿import { ApprovalStatusSelect, InputWrapper } from "../../components";
-import type {
-  ApprovalFilterPatch,
-  ApprovalFilterState,
-} from "../../types";
+import type { ApprovalFilterPatch, ApprovalFilterState } from "../../types";
 
 type SerachFieldProps = {
   value: ApprovalFilterState;
   onChange: (patch: ApprovalFilterPatch) => void;
 };
+
+const APPROVAL_STATUS_OPTIONS = [
+  { value: "", label: "선택" },
+  { value: "PENDING", label: "승인대기" },
+  { value: "APPROVED", label: "승인" },
+  { value: "REJECTED", label: "반려" },
+] as const;
 
 function SerachField({ value, onChange }: SerachFieldProps) {
   return (
@@ -39,11 +43,14 @@ function SerachField({ value, onChange }: SerachFieldProps) {
       </InputWrapper>
 
       <InputWrapper>
-        <InputWrapper.Label htmlFor="approval-status">승인상태</InputWrapper.Label>
+        <InputWrapper.Label htmlFor="approval-status">
+          승인상태
+        </InputWrapper.Label>
 
         <ApprovalStatusSelect
           id="approval-status"
           value={value.status}
+          options={[...APPROVAL_STATUS_OPTIONS]}
           onChange={(next) =>
             onChange({ status: next as ApprovalFilterState["status"] })
           }

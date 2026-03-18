@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getEvents } from "../apis";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getEvents, updateEventHidden } from "../apis";
 import { Button, EventManagementContent, PageTitleBar } from "../components";
 import { Header } from "../shared";
 import type { EventFilterPatch, EventFilterState } from "../types";
@@ -13,6 +13,7 @@ import {
 } from "../utils";
 
 function EventManagementPage() {
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<EventFilterState>(
     INITIAL_EVENT_FILTERS,
   );
@@ -33,6 +34,14 @@ function EventManagementPage() {
   const { data, isFetching } = useQuery({
     queryKey: ["event-list", eventQueryParams],
     queryFn: () => getEvents(eventQueryParams),
+  });
+  const { mutateAsync: mutateEventHidden } = useMutation({
+    mutationFn: updateEventHidden,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["event-list"],
+      });
+    },
   });
 
   const items = useMemo(
@@ -64,6 +73,13 @@ function EventManagementPage() {
     setAppliedFilters((prev) => ({ ...prev, page: nextPage }));
   };
 
+  const handleToggleEventHidden = async (
+    eventId: string,
+    nextIsHidden: boolean,
+  ) => {
+    await mutateEventHidden({ eventId, isHidden: nextIsHidden });
+  };
+
   return (
     <div className="bg-bg-app min-h-dvh w-full">
       <Header />
@@ -86,6 +102,7 @@ function EventManagementPage() {
           regionDoOptions={REGION_DO_OPTIONS}
           regionSiOptions={regionSiOptions}
           onFilterPatch={handleFilterPatch}
+          onToggleEventHidden={handleToggleEventHidden}
           items={items}
           totalCount={data?.totalElements ?? 0}
           pageSize={appliedFilters.size}

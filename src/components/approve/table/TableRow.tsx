@@ -63,6 +63,8 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const trimmedRejectionReason = rejectionReason.trim();
+  const isRejectSubmitDisabled = trimmedRejectionReason.length === 0;
 
   const handleApprove = async ({
     truckId,
@@ -161,11 +163,12 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
               ) : (
                 <>
                   <Button
+                    disabled={isRejectSubmitDisabled}
                     onClick={() => {
                       void handleReject({
                         truckId: item.truckId,
                         documentType: item.documentType,
-                        rejectionReason,
+                        rejectionReason: trimmedRejectionReason,
                       });
                     }}
                   >
@@ -193,15 +196,17 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
       <span>{item.representativeName}</span>
       <span>{item.businessName}</span>
       <span>{formatDateTime(item.openingDate)}</span>
-      {item.imageUrls.length > 0 ? (
-        <img
-          src={item.imageUrls[0]}
-          className="cursor-pointer"
-          onClick={() => setIsImageModalOpen(true)}
-        />
-      ) : (
-        "-"
-      )}
+      <span className="flex items-center justify-center">
+        {item.imageUrls.length > 0 ? (
+          <img
+            src={item.imageUrls[0]}
+            className="cursor-pointer"
+            onClick={() => setIsImageModalOpen(true)}
+          />
+        ) : (
+          "-"
+        )}
+      </span>
       <span
         className={`${STATUS_CLASS[item.status]} ${item.status === "REJECTED" ? "cursor-pointer" : ""}`}
         onClick={() => {
@@ -244,4 +249,3 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
 }
 
 export default TableRow;
-

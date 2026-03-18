@@ -52,16 +52,26 @@ function ApprovalTable({
           <span>관리</span>
         </TableHeaderWrapper>
 
-        {items.map((row) => (
-          <div
-            key={`${row.truckId}-${row.no}`}
-            className="border-border-control text-fg-primary border-b p-3.25"
-          >
-            <div className={TABLE_GRID_CLASS}>
-              <TableRow item={row} />
-            </div>
+        {isFetching ? (
+          <div className="border-border-control text-fg-muted border-b py-10 text-center text-sm">
+            데이터를 불러오는 중입니다.
           </div>
-        ))}
+        ) : items.length === 0 ? (
+          <div className="border-border-control text-fg-muted border-b py-10 text-center text-sm">
+            조회 결과가 없습니다.
+          </div>
+        ) : (
+          items.map((row) => (
+            <div
+              key={`${row.truckId}-${row.no}`}
+              className="border-border-control text-fg-primary border-b p-3.25"
+            >
+              <div className={TABLE_GRID_CLASS}>
+                <TableRow item={row} />
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Pagination

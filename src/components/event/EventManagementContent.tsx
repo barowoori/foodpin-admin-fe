@@ -13,6 +13,10 @@ type EventManagementContentProps = {
   regionDoOptions: RegionSelectOption[];
   regionSiOptions: RegionSelectOption[];
   onFilterPatch: (patch: EventFilterPatch) => void;
+  onToggleEventHidden: (
+    eventId: string,
+    nextIsHidden: boolean,
+  ) => Promise<void>;
   items: EventTableRow[];
   totalCount: number;
   pageSize: number;
@@ -28,6 +32,7 @@ function EventManagementContent({
   regionDoOptions,
   regionSiOptions,
   onFilterPatch,
+  onToggleEventHidden,
   items,
   totalCount,
   pageSize,
@@ -50,6 +55,7 @@ function EventManagementContent({
 
       <EventTable
         items={items}
+        onToggleEventHidden={onToggleEventHidden}
         totalCount={totalCount}
         pageSize={pageSize}
         totalPages={totalPages}

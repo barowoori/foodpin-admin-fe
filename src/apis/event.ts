@@ -27,6 +27,11 @@ export type EventListParams = {
   sort?: string[];
 };
 
+export type UpdateEventHiddenPayload = {
+  eventId: string;
+  isHidden: boolean;
+};
+
 function serializeParams(params: EventListParams) {
   const searchParams = new URLSearchParams();
   const appendParam = (key: string, value: string | number) => {
@@ -34,11 +39,7 @@ function serializeParams(params: EventListParams) {
   };
 
   Object.entries(params).forEach(([key, rawValue]) => {
-    if (
-      rawValue === undefined ||
-      rawValue === null ||
-      rawValue === ""
-    ) {
+    if (rawValue === undefined || rawValue === null || rawValue === "") {
       return;
     }
 
@@ -134,3 +135,13 @@ export const getEvents = async (
   return createEmptyResult(createAt, defaultPage, defaultSize);
 };
 
+export const updateEventHidden = async ({
+  eventId,
+  isHidden,
+}: UpdateEventHiddenPayload) => {
+  const res = await api.patch(`/events/v1/backoffice/${eventId}/hidden`, {
+    isHidden,
+  });
+
+  return res;
+};

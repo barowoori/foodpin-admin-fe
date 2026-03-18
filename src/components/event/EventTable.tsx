@@ -4,6 +4,10 @@ import type { EventTableRow } from "../../types";
 
 type EventTableProps = {
   items: EventTableRow[];
+  onToggleEventHidden: (
+    eventId: string,
+    nextIsHidden: boolean,
+  ) => Promise<void>;
   totalCount: number;
   pageSize: number;
   totalPages: number;
@@ -19,6 +23,7 @@ function formatDate(value: string) {
 
 function EventTable({
   items,
+  onToggleEventHidden,
   totalCount,
   pageSize,
   totalPages,
@@ -30,12 +35,37 @@ function EventTable({
   const [hiddenOverrideById, setHiddenOverrideById] = useState<
     Record<string, boolean>
   >({});
+  const [togglingById, setTogglingById] = useState<Record<string, boolean>>({});
 
-  const handleToggleFoExposure = (id: string, currentIsHidden: boolean) => {
+  const handleToggleFoExposure = async (
+    id: string,
+    currentIsHidden: boolean,
+  ) => {
+    const nextIsHidden = !currentIsHidden;
+
     setHiddenOverrideById((prev) => ({
       ...prev,
-      [id]: !currentIsHidden,
+      [id]: nextIsHidden,
     }));
+    setTogglingById((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+
+    try {
+      await onToggleEventHidden(id, nextIsHidden);
+    } catch (error) {
+      setHiddenOverrideById((prev) => ({
+        ...prev,
+        [id]: currentIsHidden,
+      }));
+      console.error("Failed to update event hidden state", error);
+    } finally {
+      setTogglingById((prev) => ({
+        ...prev,
+        [id]: false,
+      }));
+    }
   };
 
   return (
@@ -83,6 +113,7 @@ function EventTable({
                 const currentIsHidden =
                   hiddenOverrideById[row.id] ?? row.isHidden;
                 const isFoExposed = !currentIsHidden;
+                const isToggling = togglingById[row.id] ?? false;
 
                 return (
                   <tr
@@ -113,10 +144,11 @@ function EventTable({
                         role="switch"
                         aria-checked={isFoExposed}
                         aria-label={`${row.name} FO 노출 ${isFoExposed ? "켜짐" : "꺼짐"}`}
-                        onClick={() =>
-                          handleToggleFoExposure(row.id, currentIsHidden)
-                        }
-                        className={`focus-visible:ring-focus-ring/40 relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full border p-0.5 transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none ${
+                        disabled={isToggling}
+                        onClick={() => {
+                          void handleToggleFoExposure(row.id, currentIsHidden);
+                        }}
+                        className={`focus-visible:ring-focus-ring/40 relative inline-flex h-6 w-11 items-center rounded-full border p-0.5 transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
                           isFoExposed
                             ? "border-[#6F8198] bg-[#5F738A]"
                             : "border-border-control bg-bg-control"
