@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ApprovalTable, Button, DateField, SerachField } from "../components";
+import {
+  ApprovalTable,
+  Button,
+  DateField,
+  PageTitleBar,
+  SerachField,
+} from "../components";
 import type {
   ApprovalFilterPatch,
   ApprovalFilterState,
@@ -74,30 +80,30 @@ function ApprovalDashboardPage() {
     <div className="bg-bg-app min-h-dvh w-full">
       <Header />
       <div className="mx-auto w-full max-w-270 px-2 pt-16 pb-30">
-        <div className="flex justify-between">
-          <h1 className="font-pretendard tracking-brand text-fg-primary mb-10 text-[24px] font-semibold">
-            사업자 등록증 승인 관리
-          </h1>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => {
-                setFilters(INITIAL_APPROVAL_FILTERS);
-                setAppliedFilters(INITIAL_APPROVAL_FILTERS);
-              }}
-            >
-              검색 초기화
-            </Button>
-            <Button
-              disabled={isFetching}
-              onClick={() => {
-                setFilters((prev) => ({ ...prev, page: 0 }));
-                setAppliedFilters({ ...filters, page: 0 });
-              }}
-            >
-              조회
-            </Button>
-          </div>
-        </div>
+        <PageTitleBar
+          title="사업자 등록증 승인 관리"
+          actions={
+            <>
+              <Button
+                onClick={() => {
+                  setFilters(INITIAL_APPROVAL_FILTERS);
+                  setAppliedFilters(INITIAL_APPROVAL_FILTERS);
+                }}
+              >
+                검색 초기화
+              </Button>
+              <Button
+                disabled={isFetching}
+                onClick={() => {
+                  setFilters((prev) => ({ ...prev, page: 0 }));
+                  setAppliedFilters({ ...filters, page: 0 });
+                }}
+              >
+                조회
+              </Button>
+            </>
+          }
+        />
 
         <SerachField value={filters} onChange={handleFiltersChange} />
 

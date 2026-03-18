@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getEvents } from "../apis";
-import { Button, EventManagementContent } from "../components";
+import { Button, EventManagementContent, PageTitleBar } from "../components";
 import { Header } from "../shared";
 import type { EventFilterPatch, EventFilterState } from "../types";
 import {
@@ -69,18 +69,17 @@ function EventManagementPage() {
       <Header />
 
       <div className="mx-auto w-full max-w-270 px-2 pt-16 pb-24">
-        <div className="mb-10 flex items-start justify-between">
-          <h1 className="font-pretendard tracking-brand text-fg-primary text-[24px] font-semibold">
-            행사 관리
-          </h1>
-
-          <div className="flex gap-3">
-            <Button onClick={handleReset}>검색 초기화</Button>
-            <Button disabled={isFetching} onClick={handleSearch}>
-              조회
-            </Button>
-          </div>
-        </div>
+        <PageTitleBar
+          title="행사 관리"
+          actions={
+            <>
+              <Button onClick={handleReset}>검색 초기화</Button>
+              <Button disabled={isFetching} onClick={handleSearch}>
+                조회
+              </Button>
+            </>
+          }
+        />
 
         <EventManagementContent
           filters={filters}
