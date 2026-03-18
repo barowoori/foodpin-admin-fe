@@ -1,5 +1,4 @@
-import { ApprovalStatusSelect } from "../../components";
-import { InputWrapper } from "../../components";
+import { ApprovalStatusSelect, InputWrapper } from "../../components";
 import type { EventFilterPatch, EventFilterState } from "../../types";
 
 type SelectOption = {
@@ -23,7 +22,7 @@ function EventSearchField({
   return (
     <div className="grid grid-cols-2 gap-x-18 gap-y-7">
       <InputWrapper>
-        <InputWrapper.Label htmlFor="event-search">?됱궗紐?/InputWrapper.Label>
+        <InputWrapper.Label htmlFor="event-search">행사명</InputWrapper.Label>
         <InputWrapper.Input
           id="event-search"
           type="text"
@@ -34,7 +33,8 @@ function EventSearchField({
 
       <div className="flex items-center gap-3">
         <span className="font-pretendard tracking-brand text-fg-secondary text-[16px] font-medium">
-          ?됱궗吏??        </span>
+          행사지역
+        </span>
 
         <div className="flex items-end gap-4">
           <ApprovalStatusSelect
@@ -57,4 +57,3 @@ function EventSearchField({
 }
 
 export default EventSearchField;
-

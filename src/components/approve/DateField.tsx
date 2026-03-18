@@ -1,4 +1,4 @@
-import { DateRangeField } from "../../components";
+﻿import { DateRangeField } from "../../components";
 import type {
   ApprovalFilterPatch,
   ApprovalFilterState,
@@ -13,7 +13,7 @@ function DateField({ value, onChange }: DateFieldProps) {
   return (
     <div className="mt-10 flex w-full flex-wrap gap-4">
       <DateRangeField
-        label="?붿껌??
+        label="요청일"
         startId="requested-date-start"
         endId="requested-date-end"
         startDate={value.requestedStartAt}
@@ -22,7 +22,7 @@ function DateField({ value, onChange }: DateFieldProps) {
         onEndDateChange={(next) => onChange({ requestedEndAt: next })}
       />
       <DateRangeField
-        label="泥섎━??
+        label="처리일"
         startId="processed-date-start"
         endId="processed-date-end"
         startDate={value.processedStartAt}
@@ -35,5 +35,3 @@ function DateField({ value, onChange }: DateFieldProps) {
 }
 
 export default DateField;
-
-

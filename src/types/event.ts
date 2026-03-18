@@ -8,7 +8,7 @@ export interface EventRow {
   recruitmentDeadline: string;
   clickCount: number;
   createdAt: string;
-  isFoExposed: boolean;
+  isHidden: boolean;
 }
 
 export interface EventTableRow extends EventRow {

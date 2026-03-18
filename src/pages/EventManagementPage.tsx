@@ -13,7 +13,9 @@ import {
 } from "../utils";
 
 function EventManagementPage() {
-  const [filters, setFilters] = useState<EventFilterState>(INITIAL_EVENT_FILTERS);
+  const [filters, setFilters] = useState<EventFilterState>(
+    INITIAL_EVENT_FILTERS,
+  );
   const [appliedFilters, setAppliedFilters] = useState<EventFilterState>(
     INITIAL_EVENT_FILTERS,
   );
@@ -73,7 +75,7 @@ function EventManagementPage() {
           </h1>
 
           <div className="flex gap-3">
-            <Button onClick={handleReset}>검색조건 초기화</Button>
+            <Button onClick={handleReset}>검색 초기화</Button>
             <Button disabled={isFetching} onClick={handleSearch}>
               조회
             </Button>

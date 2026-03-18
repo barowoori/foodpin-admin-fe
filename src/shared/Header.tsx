@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { getInfo, type MemberInfo } from "../apis";
 import { useAuthStore } from "../stores";
@@ -43,19 +43,18 @@ function Header() {
               to="/business"
               className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             >
-              ?ъ뾽?먮벑濡?愿由?            </Link>
+              사업자등록 관리
+            </Link>
             <Link
               to="/events"
               className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             >
-              ?됱궗 愿由?            </Link>
+              행사 관리
+            </Link>
           </div>
         </div>
 
-        <div
-          className="relative"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-        >
+        <div className="relative" onClick={() => setIsMenuOpen((prev) => !prev)}>
           <button
             type="button"
             className="bg-bg-app/65 border-border-control flex cursor-pointer items-center gap-3 rounded-full border px-2.5 py-1.5"
@@ -72,9 +71,7 @@ function Header() {
               </div>
             )}
             <div className="flex flex-col pr-1">
-              <span className="text-ui-sm leading-tight font-semibold">
-                {nickname}
-              </span>
+              <span className="text-ui-sm leading-tight font-semibold">{nickname}</span>
             </div>
           </button>
 
@@ -90,7 +87,7 @@ function Header() {
               onClick={handleLogout}
               className="hover:bg-bg-app w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm text-red-500"
             >
-              濡쒓렇?꾩썐
+              로그아웃
             </button>
           </div>
         </div>
@@ -100,4 +97,3 @@ function Header() {
 }
 
 export default Header;
-

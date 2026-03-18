@@ -63,4 +63,3 @@ function EventManagementContent({
 }
 
 export default EventManagementContent;
-

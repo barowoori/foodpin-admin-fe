@@ -10,7 +10,7 @@ export type RegionSelectOption = {
   label: string;
 };
 
-const SELECT_ALL_OPTION: RegionSelectOption = { value: "", label: "?꾩껜" };
+const SELECT_ALL_OPTION: RegionSelectOption = { value: "", label: "전체" };
 
 function parseCsvRows(csvRaw: string): CsvRow[] {
   const normalized = csvRaw.replace(/^\uFEFF/, "").trim();
@@ -219,7 +219,7 @@ export function mapEventTableRows(
       recruitmentDeadline: toDate(item.recruitEndDateTime),
       clickCount: item.recruitmentUrlClickCount ?? 0,
       createdAt: toDate(item.createdAt) || toDate(data?.createAt),
-      isFoExposed: !item.isHidden,
+      isHidden: item.isHidden,
     };
   });
 }
