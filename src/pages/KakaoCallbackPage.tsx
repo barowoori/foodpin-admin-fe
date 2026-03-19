@@ -1,7 +1,7 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { loginWithKakaoCode } from "../apis/auth";
-import { useAuthStore } from "../stores/authStore";
+import { loginWithKakaoCode } from "../apis";
+import { useAuthStore } from "../stores";
 
 function KakaoCallbackPage() {
   const navigate = useNavigate();
@@ -23,9 +23,24 @@ function KakaoCallbackPage() {
       try {
         const { accessToken, refreshToken } = await loginWithKakaoCode(code);
 
+        if (!accessToken || !refreshToken) {
+          throw new Error("토큰 수신에 실패했습니다.");
+        }
+
         if (!isCancelled) {
           setTokens(accessToken, refreshToken);
-          navigate("/main", { replace: true });
+
+          const {
+            accessToken: storedAccessToken,
+            refreshToken: storedRefreshToken,
+          } = useAuthStore.getState();
+
+          if (storedAccessToken && storedRefreshToken) {
+            navigate("/business", { replace: true });
+            return;
+          }
+
+          throw new Error("토큰 저장에 실패했습니다.");
         }
       } catch {
         if (!isCancelled) {
@@ -42,7 +57,7 @@ function KakaoCallbackPage() {
   }, [navigate, setTokens]);
 
   return (
-    <div className="font-pretendard flex min-h-dvh items-center justify-center bg-[#363636] text-[#f1f1f1]">
+    <div className="font-pretendard bg-bg-app text-fg-secondary flex min-h-dvh items-center justify-center">
       Loading...
     </div>
   );

@@ -1,4 +1,4 @@
-﻿import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 
 type LabelProps = {
   children: ReactNode;
@@ -9,27 +9,26 @@ function Label({ children, htmlFor }: LabelProps) {
   return (
     <label
       htmlFor={htmlFor}
-      className="font-pretendard tracking-brand text-sm font-medium text-[#f1f1f1]"
+      className="font-pretendard tracking-brand text-fg-secondary text-[16px] font-medium"
     >
       {children}
     </label>
   );
 }
 
-function Input({
-  className = "",
-  ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
+
+function Input(props: InputProps) {
   return (
     <input
-      className={`font-pretendard h-11 rounded-lg border border-[#5a5a5a] bg-[#2b2b2b] px-3 text-sm text-[#fafafa] transition outline-none placeholder:text-[#a0a0a0] focus:border-[#6f8198] focus:ring-2 focus:ring-[#6f8198]/30 ${className}`}
+      className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 max-w-40 rounded-lg border px-3 transition outline-none read-only:cursor-default focus:ring-2"
       {...props}
     />
   );
 }
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <div className="flex items-center gap-5">{children}</div>;
+  return <div className="flex items-center gap-3">{children}</div>;
 }
 
 const InputWrapper = Object.assign(Wrapper, {

@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
-import KakaoCallbackPage from "./pages/KakaoCallbackPage";
-import LoginPage from "./pages/LoginPage";
-import MainPage from "./pages/MainPage";
+import {
+  ApprovalDashboardPage,
+  EventManagementPage,
+  KakaoCallbackPage,
+  LoginPage,
+} from "./pages";
+import EventFormPage from "./pages/EventFormPage";
 
 function App() {
   return (
@@ -10,7 +14,9 @@ function App() {
       <Routes>
         <Route path="/" element={<KakaoCallbackPage />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="main" element={<MainPage />} />
+        <Route path="business" element={<ApprovalDashboardPage />} />
+        <Route path="events" element={<EventManagementPage />} />
+        <Route path="events/form" element={<EventFormPage />} />
       </Routes>
     </BrowserRouter>
   );
