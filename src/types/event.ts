@@ -121,23 +121,22 @@ export interface EventRecruitFormState {
   isRecruitEndOnSelection: boolean;
 }
 
-export type TruckType = "SNACK" | "MEAL" | "STREET_FOOD" | "CAFE";
+export type TruckType = "SNACK" | "MEAL" | "STREET_FOOD" | "COFFEE";
 
 export type SaleType = "NORMAL" | "CATERING";
 
 export type PriceRange =
   | "UNDER_7000"
+  | "UNDER_8000"
+  | "UNDER_9000"
   | "UNDER_10000"
-  | "UNDER_12000"
-  | "UNDER_15000"
-  | "OVER_15000"
-  | "UNLIMITED";
+  | "NO_MATTER";
 
 export interface EventTargetFormState {
   truckTypes: TruckType[];
   eventCategoryCodeList: string[];
   saleType: SaleType;
-  priceRange: PriceRange;
+  priceRange: PriceRange | "";
   cateringDetail: string;
 }
 
@@ -145,7 +144,7 @@ export interface EventDetailFormState {
   description: string;
   guidelines: string;
   contact: string;
-  electricitySupportAvailability: boolean;
+  electricitySupportAvailability: boolean | null;
   generatorRequirement: boolean;
 }
 
@@ -175,14 +174,14 @@ export interface EventCreateRequestBody {
     truckTypes: TruckType[];
     eventCategoryCodeList: string[];
     saleType: SaleType;
-    priceRange: PriceRange;
-    cateringDetail: string;
+    priceRange?: PriceRange;
+    cateringDetail?: string;
   };
   eventDetailDto: {
     description: string;
     guidelines: string;
     contact: string;
-    electricitySupportAvailability: boolean;
+    electricitySupportAvailability: boolean | null;
     generatorRequirement: boolean;
   };
 }

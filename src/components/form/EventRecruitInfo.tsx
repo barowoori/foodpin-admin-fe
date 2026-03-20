@@ -29,7 +29,7 @@ function EventRecruitInfo({ value, onChange }: EventRecruitInfoProps) {
           onChange={(event) =>
             onChange({ recruitCount: Number(event.target.value) || 0 })
           }
-          className="w-[200px]"
+          className="w-50"
         />
       </FormBox.Row>
 

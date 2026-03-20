@@ -6,6 +6,7 @@ import { REGION_DO_OPTIONS, getRegionSiOptions } from "../../utils";
 import BaseInfoEventDateField from "./BaseInfoEventDateField";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
+import FormTextArea from "./FormTextArea";
 import ParticipantCountRadioGroup from "./ParticipantCountRadioGroup";
 
 const EVENT_CATEGORY_OPTIONS = [
@@ -103,11 +104,11 @@ function EventBaseInfo({
         </FormBox.Row>
 
         <FormBox.Row label="행사명" required>
-          <FormInput
+          <FormTextArea
             value={value.name}
             onChange={(event) => onChange({ name: event.target.value })}
             placeholder="행사명을 입력하세요"
-            className="w-[320px]"
+            className="w-[320px] min-h-11 resize-y"
           />
         </FormBox.Row>
 
@@ -178,7 +179,7 @@ function EventBaseInfo({
           />
         </FormBox.Row>
 
-        <FormBox.Row label="모집 URL">
+        <FormBox.Row label="모집 URL" required>
           <FormInput
             value={value.recruitmentUrl}
             onChange={(event) =>

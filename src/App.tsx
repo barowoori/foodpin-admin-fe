@@ -17,6 +17,7 @@ function App() {
         <Route path="business" element={<ApprovalDashboardPage />} />
         <Route path="events" element={<EventManagementPage />} />
         <Route path="events/form" element={<EventFormPage />} />
+        <Route path="events/form/:eventId" element={<EventFormPage />} />
       </Routes>
     </BrowserRouter>
   );

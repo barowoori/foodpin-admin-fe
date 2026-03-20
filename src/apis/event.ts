@@ -32,6 +32,62 @@ export type UpdateEventHiddenPayload = {
   isHidden: boolean;
 };
 
+export type EventDetailResponse = {
+  id: string;
+  createAt: string;
+  data?: {
+    id?: string;
+    isEventManager?: boolean;
+    isLike?: boolean;
+    photos?: Array<{
+      id?: string;
+      path?: string;
+    }>;
+    recruitInfo?: {
+      status?: string;
+      isRecruitEndOnSelection?: boolean;
+      applicantCount?: number;
+      selectedCount?: number;
+      recruitCount?: number;
+    };
+    name?: string;
+    regions?: Array<{
+      code?: string;
+      name?: string;
+    }>;
+    regionList?: string;
+    dates?: Array<{
+      id?: string;
+      date?: string;
+      startTime?: string;
+      endTime?: string;
+    }>;
+    entryFee?: number;
+    electricitySupportAvailability?: boolean | null;
+    generatorRequirement?: boolean;
+    categories?: Array<{
+      code?: string;
+      name?: string;
+    }>;
+    documents?: string[];
+    type?: string;
+    truckTypes?: string[];
+    expectedParticipants?: string;
+    saleType?: string;
+    priceRange?: string;
+    cateringDetail?: string;
+    contact?: string;
+    description?: string;
+    guidelines?: string;
+    recruitmentUrl?: string;
+    isFullAttendanceRequired?: boolean;
+    documentSubmissionTarget?: string;
+    submissionEmail?: string;
+    isRecruitEndOnSelection?: boolean;
+    recruitEndDateTime?: string;
+  } | null;
+};
+
 function serializeParams(params: EventListParams) {
   const searchParams = new URLSearchParams();
   const appendParam = (key: string, value: string | number) => {
@@ -148,5 +204,15 @@ export const updateEventHidden = async ({
 
 export const createEvent = async (payload: EventCreateRequestBody) => {
   const res = await api.post("/events/v1/backoffice", payload);
+  return res.data;
+};
+
+export const getEventDetail = async (eventId: string) => {
+  const res = await api.get<EventDetailResponse>(`/events/v1/${eventId}/detail`);
+  return res.data?.data ?? null;
+};
+
+export const deleteEvent = async (eventId: string) => {
+  const res = await api.delete(`/events/v1/${eventId}`);
   return res.data;
 };
