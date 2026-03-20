@@ -1,226 +1,141 @@
-﻿import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { createEvent } from "../apis";
 import { Button } from "../components";
 import {
   EventBaseInfo,
   EventDetailInfo,
   EventRecruitInfo,
+  EventRecruitmentUrlInfo,
   EventTargetInfo,
 } from "../components/form";
 import { Header } from "../shared";
-import type {
-  BaseInfoFormState,
-  EventCreateRequestBody,
-  EventDateTime,
-  EventDetailFormState,
-  EventRecruitFormState,
-  EventTargetFormState,
-  EventType,
-} from "../types";
-import {
-  applyBaseInfoPatch,
-  applyPeriodTimeChange,
-  getIsoDateRange,
-  INITIAL_EVENT_FORM_BASE_INFO,
-  INITIAL_EVENT_FORM_DETAIL,
-  INITIAL_EVENT_FORM_RECRUIT,
-  INITIAL_EVENT_FORM_TARGET,
-} from "../utils";
+import { useEventDelete } from "./eventForm/useEventDelete";
+import { useEventDetailHydration } from "./eventForm/useEventDetailHydration";
+import { useEventFormState } from "./eventForm/useEventFormState";
+import { useEventFormSubmit } from "./eventForm/useEventFormSubmit";
+import { useEventSectionUpdate } from "./eventForm/useEventSectionUpdate";
 
-function normalizeTimeValue(value: string) {
-  if (!value) {
-    return "00:00:00";
-  }
-
-  return value.length === 5 ? `${value}:00` : value;
-}
-
-function toIsoDateTime(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return "";
-  }
-
-  return parsed.toISOString();
-}
+type EventSection = "info" | "recruit" | "target" | "detail" | "url";
 
 function EventFormPage() {
   const navigate = useNavigate();
-  const [baseInfoForm, setBaseInfoForm] = useState<BaseInfoFormState>(
-    INITIAL_EVENT_FORM_BASE_INFO,
-  );
-  const [eventRecruitForm, setEventRecruitForm] =
-    useState<EventRecruitFormState>(INITIAL_EVENT_FORM_RECRUIT);
-  const [eventTargetForm, setEventTargetForm] = useState<EventTargetFormState>(
-    INITIAL_EVENT_FORM_TARGET,
-  );
-  const [eventDetailForm, setEventDetailForm] = useState<EventDetailFormState>(
-    INITIAL_EVENT_FORM_DETAIL,
-  );
 
-  const { mutateAsync: mutateCreateEvent, isPending } = useMutation({
-    mutationFn: createEvent,
+  const {
+    baseInfoForm,
+    eventRecruitForm,
+    eventTargetForm,
+    eventDetailForm,
+    handleBaseInfoChange,
+    handlePeriodTimeChange,
+    handleRecruitInfoChange,
+    handleTargetInfoChange,
+    handleDetailInfoChange,
+    hydrateFromDetail,
+  } = useEventFormState();
+
+  const { eventId, isDetailMode, isDetailLoading } = useEventDetailHydration({
+    hydrateFromDetail,
   });
 
-  const handleBaseInfoChange = (patch: Partial<BaseInfoFormState>) => {
-    setBaseInfoForm((prev) => applyBaseInfoPatch(prev, patch));
-  };
+  const { isPending, handleSubmit } = useEventFormSubmit({
+    baseInfoForm,
+    eventRecruitForm,
+    eventTargetForm,
+    eventDetailForm,
+  });
 
-  const handlePeriodTimeChange = (
-    date: string,
-    key: keyof EventDateTime,
-    value: string,
-  ) => {
-    setBaseInfoForm((prev) => applyPeriodTimeChange(prev, date, key, value));
-  };
+  const { isDeletePending, handleDelete } = useEventDelete({ eventId });
 
-  const handleRecruitInfoChange = (patch: Partial<EventRecruitFormState>) => {
-    setEventRecruitForm((prev) => ({ ...prev, ...patch }));
-  };
+  const {
+    isInfoUpdating,
+    isRecruitUpdating,
+    isTargetUpdating,
+    isDetailUpdating,
+    isRecruitmentUrlUpdating,
+    handleInfoUpdate,
+    handleRecruitUpdate,
+    handleTargetUpdate,
+    handleDetailUpdate,
+    handleRecruitmentUrlUpdate,
+  } = useEventSectionUpdate({
+    eventId,
+    baseInfoForm,
+    eventRecruitForm,
+    eventTargetForm,
+    eventDetailForm,
+  });
 
-  const handleTargetInfoChange = (patch: Partial<EventTargetFormState>) => {
-    setEventTargetForm((prev) => ({ ...prev, ...patch }));
-  };
+  const renderSectionEditButton = (section: EventSection) => {
+    if (!isDetailMode) {
+      return null;
+    }
 
-  const handleDetailInfoChange = (patch: Partial<EventDetailFormState>) => {
-    setEventDetailForm((prev) => ({ ...prev, ...patch }));
-  };
-
-  const buildEventDateDtoList = () => {
-    if (baseInfoForm.eventDateMode === "PERIOD") {
-      const dates = getIsoDateRange(
-        baseInfoForm.periodStartDate,
-        baseInfoForm.periodEndDate,
+    if (section === "info") {
+      return (
+        <div className="flex justify-end">
+          <Button
+            onClick={handleInfoUpdate}
+            disabled={isInfoUpdating}
+            className="min-w-24 border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+          >
+            {isInfoUpdating ? "수정 중.." : "수정"}
+          </Button>
+        </div>
       );
-
-      return dates.map((date) => {
-        const time = baseInfoForm.periodTimeByDate[date];
-
-        return {
-          date,
-          startTime: normalizeTimeValue(time?.startTime ?? ""),
-          endTime: normalizeTimeValue(time?.endTime ?? ""),
-        };
-      });
     }
 
-    return baseInfoForm.selectedDates.map((date) => ({
-      date,
-      startTime: "00:00:00",
-      endTime: "00:00:00",
-    }));
-  };
-
-  const buildRequestBody = (): EventCreateRequestBody | null => {
-    if (!baseInfoForm.name.trim()) {
-      alert("행사명을 입력해주세요.");
-      return null;
+    if (section === "recruit") {
+      return (
+        <div className="flex justify-end">
+          <Button
+            onClick={handleRecruitUpdate}
+            disabled={isRecruitUpdating}
+            className="min-w-24 border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+          >
+            {isRecruitUpdating ? "수정 중.." : "수정"}
+          </Button>
+        </div>
+      );
     }
 
-    if (!baseInfoForm.type) {
-      alert("행사 종류를 선택해주세요.");
-      return null;
+    if (section === "target") {
+      return (
+        <div className="flex justify-end">
+          <Button
+            onClick={handleTargetUpdate}
+            disabled={isTargetUpdating}
+            className="min-w-24 border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+          >
+            {isTargetUpdating ? "수정 중.." : "수정"}
+          </Button>
+        </div>
+      );
     }
 
-    const regionCode = baseInfoForm.regionSi || baseInfoForm.regionDo;
-    if (!regionCode) {
-      alert("행사 지역을 선택해주세요.");
-      return null;
+    if (section === "url") {
+      return (
+        <div className="flex justify-end">
+          <Button
+            onClick={handleRecruitmentUrlUpdate}
+            disabled={isRecruitmentUrlUpdating}
+            className="min-w-24 border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+          >
+            {isRecruitmentUrlUpdating ? "수정 중.." : "수정"}
+          </Button>
+        </div>
+      );
     }
 
-    const eventDateDtoList = buildEventDateDtoList();
-    if (eventDateDtoList.length === 0) {
-      alert("행사 일시를 선택해주세요.");
-      return null;
-    }
-
-    if (!eventRecruitForm.recruitEndDateTime) {
-      alert("모집마감일을 입력해주세요.");
-      return null;
-    }
-
-    if (eventTargetForm.truckTypes.length === 0) {
-      alert("푸드트럭 유형을 1개 이상 선택해주세요.");
-      return null;
-    }
-
-    if (eventTargetForm.eventCategoryCodeList.length === 0) {
-      alert("메뉴 카테고리를 1개 이상 선택해주세요.");
-      return null;
-    }
-
-    if (!eventDetailForm.description.trim()) {
-      alert("상세설명을 입력해주세요.");
-      return null;
-    }
-
-    if (!eventDetailForm.guidelines.trim()) {
-      alert("유의사항을 입력해주세요.");
-      return null;
-    }
-
-    if (!eventDetailForm.contact.trim()) {
-      alert("연락처를 입력해주세요.");
-      return null;
-    }
-
-    const recruitEndDateTimeIso = toIsoDateTime(
-      eventRecruitForm.recruitEndDateTime,
+    return (
+      <div className="flex justify-end">
+        <Button
+          onClick={handleDetailUpdate}
+          disabled={isDetailUpdating}
+          className="min-w-24 border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+        >
+          {isDetailUpdating ? "수정 중.." : "수정"}
+        </Button>
+      </div>
     );
-    if (!recruitEndDateTimeIso) {
-      alert("모집마감일 형식이 올바르지 않습니다.");
-      return null;
-    }
-
-    return {
-      eventInfoDto: {
-        name: baseInfoForm.name.trim(),
-        type: baseInfoForm.type as EventType,
-        expectedParticipants: baseInfoForm.expectedParticipants,
-        fileIdList: baseInfoForm.fileIdList,
-        regionCode,
-        eventDateDtoList,
-        recruitmentUrl: baseInfoForm.recruitmentUrl.trim(),
-      },
-      eventRecruitDto: {
-        recruitEndDateTime: recruitEndDateTimeIso,
-        recruitCount: Math.max(0, eventRecruitForm.recruitCount),
-        isFullAttendanceRequired: eventRecruitForm.isFullAttendanceRequired,
-        isRecruitEndOnSelection: eventRecruitForm.isRecruitEndOnSelection,
-      },
-      eventTargetDto: {
-        truckTypes: eventTargetForm.truckTypes,
-        eventCategoryCodeList: eventTargetForm.eventCategoryCodeList,
-        saleType: eventTargetForm.saleType,
-        priceRange: eventTargetForm.priceRange,
-        cateringDetail: eventTargetForm.cateringDetail.trim(),
-      },
-      eventDetailDto: {
-        description: eventDetailForm.description.trim(),
-        guidelines: eventDetailForm.guidelines.trim(),
-        contact: eventDetailForm.contact.trim(),
-        electricitySupportAvailability:
-          eventDetailForm.electricitySupportAvailability,
-        generatorRequirement: eventDetailForm.generatorRequirement,
-      },
-    };
-  };
-
-  const handleSubmit = async () => {
-    const requestBody = buildRequestBody();
-    if (!requestBody) {
-      return;
-    }
-
-    try {
-      await mutateCreateEvent(requestBody);
-      navigate("/events");
-    } catch (error) {
-      console.error("Failed to create event", error);
-      alert("행사 등록에 실패했습니다.");
-    }
   };
 
   return (
@@ -229,12 +144,22 @@ function EventFormPage() {
 
       <div className="mx-auto flex w-full max-w-270 flex-col gap-10 px-2 pt-16 pb-24">
         <div className="flex flex-col gap-4 text-[24px] font-semibold">
-          <span className="text-fg-primary">행사 등록</span>
+          <span className="text-fg-primary">
+            {isDetailMode ? "행사 상세 조회" : "행사 등록"}
+          </span>
           <div className="tracking-brand mb-2 text-[16px] text-[#f3f3f3]">
-            행사 정보를 등록합니다.{" "}
-            <span className="text-[#ff7e7e]">(*필수 입력)</span>
+            {isDetailMode
+              ? "행사 정보를 확인합니다."
+              : "행사 정보를 등록합니다."}
+            <span className="text-[#ff7e7e]"> (*필수 입력)</span>
           </div>
         </div>
+
+        {isDetailMode && isDetailLoading ? (
+          <div className="text-fg-muted rounded-lg border border-[#3f434a] bg-[#262a30] px-4 py-6 text-sm">
+            행사 상세 정보를 불러오는 중입니다.
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-12">
           <section className="flex flex-col gap-4">
@@ -246,6 +171,7 @@ function EventFormPage() {
               onChange={handleBaseInfoChange}
               onPeriodTimeChange={handlePeriodTimeChange}
             />
+            {renderSectionEditButton("info")}
           </section>
 
           <section className="flex flex-col gap-4">
@@ -256,6 +182,7 @@ function EventFormPage() {
               value={eventRecruitForm}
               onChange={handleRecruitInfoChange}
             />
+            {renderSectionEditButton("recruit")}
           </section>
 
           <section className="flex flex-col gap-4">
@@ -266,6 +193,7 @@ function EventFormPage() {
               value={eventTargetForm}
               onChange={handleTargetInfoChange}
             />
+            {renderSectionEditButton("target")}
           </section>
 
           <section className="flex flex-col gap-4">
@@ -276,20 +204,52 @@ function EventFormPage() {
               value={eventDetailForm}
               onChange={handleDetailInfoChange}
             />
+            {renderSectionEditButton("detail")}
           </section>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <Button
-              onClick={handleSubmit}
-              disabled={isPending}
-              className="min-w-28 bg-[#5f738a] hover:bg-[#6b819b]"
-            >
-              {isPending ? "등록 중..." : "등록"}
-            </Button>
-            <Button onClick={() => navigate("/events")} className="min-w-28">
-              취소
-            </Button>
-          </div>
+          <section className="flex flex-col gap-4">
+            <h2 className="text-fg-secondary text-[18px] font-semibold">
+              모집 URL
+            </h2>
+            <EventRecruitmentUrlInfo
+              value={baseInfoForm.recruitmentUrl}
+              onChange={(recruitmentUrl) =>
+                handleBaseInfoChange({ recruitmentUrl })
+              }
+            />
+            {renderSectionEditButton("url")}
+          </section>
+
+          {isDetailMode ? (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Button
+                onClick={handleDelete}
+                disabled={isDeletePending}
+                className="h-14 min-w-32 rounded-none border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+              >
+                {isDeletePending ? "삭제 중.." : "삭제"}
+              </Button>
+              <Button
+                onClick={() => navigate("/events")}
+                className="h-14 min-w-32 rounded-none border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+              >
+                목록
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Button
+                onClick={handleSubmit}
+                disabled={isPending}
+                className="min-w-28 bg-[#5f738a] hover:bg-[#6b819b]"
+              >
+                {isPending ? "등록 중.." : "등록"}
+              </Button>
+              <Button onClick={() => navigate("/events")} className="min-w-28">
+                취소
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

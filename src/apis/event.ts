@@ -1,5 +1,13 @@
 import api from ".";
-import type { EventCreateRequestBody, EventItem, EventListResult } from "../types";
+import type {
+  EventCreateRequestBody,
+  EventDateRequestDto,
+  EventDetailFormState,
+  EventItem,
+  EventListResult,
+  EventType,
+  ExpectedParticipants,
+} from "../types";
 
 type EventPageData = {
   totalElements?: number | null;
@@ -30,6 +38,92 @@ export type EventListParams = {
 export type UpdateEventHiddenPayload = {
   eventId: string;
   isHidden: boolean;
+};
+
+type EventCommandResponse = {
+  id: string;
+  createAt: string;
+  data?: string | null;
+};
+
+export type UpdateEventInfoPayload = {
+  name: string;
+  type: EventType;
+  expectedParticipants: ExpectedParticipants;
+  fileIdList: string[];
+  eventDateDtoList: EventDateRequestDto[];
+  regionCode: string;
+};
+
+export type UpdateEventDetailPayload = Pick<
+  EventDetailFormState,
+  | "description"
+  | "guidelines"
+  | "contact"
+  | "electricitySupportAvailability"
+  | "generatorRequirement"
+>;
+
+export type UpdateEventRecruitPayload = EventCreateRequestBody["eventRecruitDto"];
+export type UpdateEventTargetPayload = EventCreateRequestBody["eventTargetDto"];
+export type UpdateEventRecruitmentUrlPayload = {
+  recruitmentUrl: string;
+};
+
+export type EventDetailResponse = {
+  id: string;
+  createAt: string;
+  data?: {
+    id?: string;
+    isEventManager?: boolean;
+    isLike?: boolean;
+    photos?: Array<{
+      id?: string;
+      path?: string;
+    }>;
+    recruitInfo?: {
+      status?: string;
+      isRecruitEndOnSelection?: boolean;
+      applicantCount?: number;
+      selectedCount?: number;
+      recruitCount?: number;
+    };
+    name?: string;
+    regions?: Array<{
+      code?: string;
+      name?: string;
+    }>;
+    regionList?: string;
+    dates?: Array<{
+      id?: string;
+      date?: string;
+      startTime?: string;
+      endTime?: string;
+    }>;
+    entryFee?: number;
+    electricitySupportAvailability?: boolean | null;
+    generatorRequirement?: boolean;
+    categories?: Array<{
+      code?: string;
+      name?: string;
+    }>;
+    documents?: string[];
+    type?: string;
+    truckTypes?: string[];
+    expectedParticipants?: string;
+    saleType?: string;
+    priceRange?: string;
+    cateringDetail?: string;
+    contact?: string;
+    description?: string;
+    guidelines?: string;
+    recruitmentUrl?: string;
+    isFullAttendanceRequired?: boolean;
+    documentSubmissionTarget?: string;
+    submissionEmail?: string;
+    isRecruitEndOnSelection?: boolean;
+    recruitEndDateTime?: string;
+  } | null;
 };
 
 function serializeParams(params: EventListParams) {
@@ -148,5 +242,70 @@ export const updateEventHidden = async ({
 
 export const createEvent = async (payload: EventCreateRequestBody) => {
   const res = await api.post("/events/v1/backoffice", payload);
+  return res.data;
+};
+
+export const getEventDetail = async (eventId: string) => {
+  const res = await api.get<EventDetailResponse>(`/events/v1/${eventId}/detail`);
+  return res.data?.data ?? null;
+};
+
+export const deleteEvent = async (eventId: string) => {
+  const res = await api.delete(`/events/v1/${eventId}`);
+  return res.data;
+};
+
+export const updateEventInfo = async (
+  eventId: string,
+  payload: UpdateEventInfoPayload,
+) => {
+  const res = await api.put<EventCommandResponse>(
+    `/events/v1/${eventId}/info`,
+    payload,
+  );
+  return res.data;
+};
+
+export const updateEventDetail = async (
+  eventId: string,
+  payload: UpdateEventDetailPayload,
+) => {
+  const res = await api.put<EventCommandResponse>(
+    `/events/v1/${eventId}/detail`,
+    payload,
+  );
+  return res.data;
+};
+
+export const updateEventRecruit = async (
+  eventId: string,
+  payload: UpdateEventRecruitPayload,
+) => {
+  const res = await api.put<EventCommandResponse>(
+    `/events/v1/${eventId}/recruit`,
+    payload,
+  );
+  return res.data;
+};
+
+export const updateEventTarget = async (
+  eventId: string,
+  payload: UpdateEventTargetPayload,
+) => {
+  const res = await api.put<EventCommandResponse>(
+    `/events/v1/${eventId}/target`,
+    payload,
+  );
+  return res.data;
+};
+
+export const updateEventRecruitmentUrl = async (
+  eventId: string,
+  payload: UpdateEventRecruitmentUrlPayload,
+) => {
+  const res = await api.patch<EventCommandResponse>(
+    `/events/v1/backoffice/${eventId}/recruitment-url`,
+    payload,
+  );
   return res.data;
 };
