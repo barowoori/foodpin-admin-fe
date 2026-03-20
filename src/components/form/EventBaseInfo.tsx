@@ -18,7 +18,7 @@ const EVENT_CATEGORY_OPTIONS = [
   { value: "CELEBRITY_SUPPORT", label: "연예인 서포트" },
 ] satisfies Array<{ value: EventType | ""; label: string }>;
 
-interface BaseInfoProps {
+interface EventBaseInfoProps {
   value: BaseInfoFormState;
   onChange: (patch: Partial<BaseInfoFormState>) => void;
   onPeriodTimeChange: (
@@ -28,7 +28,11 @@ interface BaseInfoProps {
   ) => void;
 }
 
-function BaseInfo({ value, onChange, onPeriodTimeChange }: BaseInfoProps) {
+function EventBaseInfo({
+  value,
+  onChange,
+  onPeriodTimeChange,
+}: EventBaseInfoProps) {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const regionSiOptions = useMemo(
     () => getRegionSiOptions(value.regionDo),
@@ -189,4 +193,4 @@ function BaseInfo({ value, onChange, onPeriodTimeChange }: BaseInfoProps) {
   );
 }
 
-export default BaseInfo;
+export default EventBaseInfo;

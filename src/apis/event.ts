@@ -1,5 +1,5 @@
 import api from ".";
-import type { EventItem, EventListResult } from "../types";
+import type { EventCreateRequestBody, EventItem, EventListResult } from "../types";
 
 type EventPageData = {
   totalElements?: number | null;
@@ -144,4 +144,9 @@ export const updateEventHidden = async ({
   });
 
   return res;
+};
+
+export const createEvent = async (payload: EventCreateRequestBody) => {
+  const res = await api.post("/events/v1/backoffice", payload);
+  return res.data;
 };
