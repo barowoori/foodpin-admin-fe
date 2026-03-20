@@ -34,7 +34,7 @@ function toFormDateTimeValue(value: Date) {
 
 function EventRecruitInfo({ value, onChange }: EventRecruitInfoProps) {
   return (
-    <FormBox>
+    <FormBox className="overflow-visible">
       <FormBox.Row label="모집마감일" required>
         <div className="w-[320px]">
           <DatePicker

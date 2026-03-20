@@ -103,6 +103,7 @@ export interface BaseInfoFormState {
   expectedParticipants: ExpectedParticipants;
   fileIdList: string[];
   photoFiles: File[];
+  photoPaths: string[];
   regionDo: string;
   regionSi: string;
   recruitmentUrl: string;

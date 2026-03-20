@@ -19,6 +19,15 @@ import type {
   EventTargetFormState,
 } from "../../types";
 import { buildEventDateDtoList, normalizeEventCategoryCodes } from "./formModel";
+import {
+  CATERING_DETAIL_LIMIT,
+  DESCRIPTION_LIMIT,
+  EVENT_NAME_LIMIT,
+  GUIDELINES_LIMIT,
+  getMaxLengthMessage,
+  getMinLengthMessage,
+  validateTextLength,
+} from "./textLengthValidation";
 
 type UseEventSectionUpdateParams = {
   eventId: string | undefined;
@@ -29,8 +38,6 @@ type UseEventSectionUpdateParams = {
 };
 
 const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
-const DETAIL_TEXT_MIN_LENGTH = 10;
-const DETAIL_TEXT_MAX_LENGTH = 10000;
 
 function toIsoDateTime(value: string) {
   const parsed = new Date(value);
@@ -103,6 +110,16 @@ export function useEventSectionUpdate({
       return;
     }
 
+    const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);
+    if (nameLengthValidation.isUnderMin) {
+      alert(getMinLengthMessage(EVENT_NAME_LIMIT.min));
+      return;
+    }
+    if (nameLengthValidation.isOverMax) {
+      alert(getMaxLengthMessage(EVENT_NAME_LIMIT.max));
+      return;
+    }
+
     const regionCode = baseInfoForm.regionSi || baseInfoForm.regionDo;
     const eventDateDtoList = buildEventDateDtoList(baseInfoForm);
     if (!regionCode || eventDateDtoList.length === 0) {
@@ -133,8 +150,8 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const description = eventDetailForm.description.trim();
-    const guidelines = eventDetailForm.guidelines.trim();
+    const description = eventDetailForm.description;
+    const guidelines = eventDetailForm.guidelines;
     const contact = eventDetailForm.contact.trim();
 
     if (!description || !guidelines || !contact) {
@@ -142,29 +159,29 @@ export function useEventSectionUpdate({
       return;
     }
 
-    if (
-      description.length < DETAIL_TEXT_MIN_LENGTH ||
-      description.length > DETAIL_TEXT_MAX_LENGTH
-    ) {
-      alert(
-        `상세설명은 ${DETAIL_TEXT_MIN_LENGTH}자 이상 ${DETAIL_TEXT_MAX_LENGTH}자 이하로 입력해주세요.`,
-      );
+    const descriptionValidation = validateTextLength(description, DESCRIPTION_LIMIT);
+    if (descriptionValidation.isUnderMin) {
+      alert(getMinLengthMessage(DESCRIPTION_LIMIT.min));
+      return;
+    }
+    if (descriptionValidation.isOverMax) {
+      alert(getMaxLengthMessage(DESCRIPTION_LIMIT.max));
       return;
     }
 
-    if (
-      guidelines.length < DETAIL_TEXT_MIN_LENGTH ||
-      guidelines.length > DETAIL_TEXT_MAX_LENGTH
-    ) {
-      alert(
-        `유의사항은 ${DETAIL_TEXT_MIN_LENGTH}자 이상 ${DETAIL_TEXT_MAX_LENGTH}자 이하로 입력해주세요.`,
-      );
+    const guidelinesValidation = validateTextLength(guidelines, GUIDELINES_LIMIT);
+    if (guidelinesValidation.isUnderMin) {
+      alert(getMinLengthMessage(GUIDELINES_LIMIT.min));
+      return;
+    }
+    if (guidelinesValidation.isOverMax) {
+      alert(getMaxLengthMessage(GUIDELINES_LIMIT.max));
       return;
     }
 
     const payload: UpdateEventDetailPayload = {
-      description,
-      guidelines,
+      description: description.trim(),
+      guidelines: guidelines.trim(),
       contact,
       electricitySupportAvailability: eventDetailForm.electricitySupportAvailability,
       generatorRequirement: eventDetailForm.generatorRequirement,
@@ -228,6 +245,20 @@ export function useEventSectionUpdate({
     if (eventTargetForm.saleType === "CATERING" && !trimmedCateringDetail) {
       alert(REQUIRED_VALIDATION_MESSAGE);
       return;
+    }
+    if (eventTargetForm.saleType === "CATERING") {
+      const cateringValidation = validateTextLength(
+        eventTargetForm.cateringDetail,
+        CATERING_DETAIL_LIMIT,
+      );
+      if (cateringValidation.isUnderMin) {
+        alert(getMinLengthMessage(CATERING_DETAIL_LIMIT.min));
+        return;
+      }
+      if (cateringValidation.isOverMax) {
+        alert(getMaxLengthMessage(CATERING_DETAIL_LIMIT.max));
+        return;
+      }
     }
 
     const payload: UpdateEventTargetPayload = {

@@ -129,3 +129,4 @@ export default api;
 export * from "./auth";
 export * from "./truck";
 export * from "./event";
+export * from "./file";

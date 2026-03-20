@@ -16,21 +16,18 @@ export function useEventDelete({ eventId }: UseEventDeleteParams) {
 
   const handleDelete = useCallback(async () => {
     if (!eventId) {
-      return;
-    }
-
-    const isConfirmed = confirm("행사를 삭제하시겠습니까?");
-    if (!isConfirmed) {
-      return;
+      return false;
     }
 
     try {
       await mutateDeleteEvent(eventId);
       alert("행사가 삭제되었습니다.");
       navigate("/events");
+      return true;
     } catch (error) {
       console.error("Failed to delete event", error);
       alert("행사 삭제에 실패했습니다.");
+      return false;
     }
   }, [eventId, mutateDeleteEvent, navigate]);
 

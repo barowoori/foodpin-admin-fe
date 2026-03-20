@@ -22,6 +22,15 @@ import {
   INITIAL_EVENT_FORM_TARGET,
   REGION_DO_OPTIONS,
 } from "../../utils";
+import {
+  CATERING_DETAIL_LIMIT,
+  DESCRIPTION_LIMIT,
+  EVENT_NAME_LIMIT,
+  GUIDELINES_LIMIT,
+  getMaxLengthMessage,
+  getMinLengthMessage,
+  validateTextLength,
+} from "./textLengthValidation";
 
 const EVENT_TYPES: EventType[] = [
   "CORPORATE",
@@ -69,8 +78,6 @@ const EVENT_CATEGORY_CODE_MAP: Record<string, string> = {
 };
 
 const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
-const DETAIL_TEXT_MIN_LENGTH = 10;
-const DETAIL_TEXT_MAX_LENGTH = 10000;
 
 export type EventDetailData = NonNullable<EventDetailResponse["data"]>;
 
@@ -242,6 +249,10 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
         ?.map((photo) => photo?.id)
         .filter((id): id is string => typeof id === "string") ?? [],
     photoFiles: [],
+    photoPaths:
+      detail.photos
+        ?.map((photo) => photo?.path)
+        .filter((path): path is string => typeof path === "string") ?? [],
     regionDo,
     regionSi,
     recruitmentUrl: detail.recruitmentUrl ?? "",
@@ -344,6 +355,14 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
+  const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);
+  if (nameLengthValidation.isUnderMin) {
+    return fail(getMinLengthMessage(EVENT_NAME_LIMIT.min));
+  }
+  if (nameLengthValidation.isOverMax) {
+    return fail(getMaxLengthMessage(EVENT_NAME_LIMIT.max));
+  }
+
   if (!baseInfoForm.type) {
     return fail();
   }
@@ -383,18 +402,26 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
-  const description = eventDetailForm.description.trim();
-  if (description.length < DETAIL_TEXT_MIN_LENGTH || description.length > DETAIL_TEXT_MAX_LENGTH) {
-    return fail(
-      `상세설명은 ${DETAIL_TEXT_MIN_LENGTH}자 이상 ${DETAIL_TEXT_MAX_LENGTH}자 이하로 입력해주세요.`,
-    );
+  const descriptionLengthValidation = validateTextLength(
+    eventDetailForm.description,
+    DESCRIPTION_LIMIT,
+  );
+  if (descriptionLengthValidation.isUnderMin) {
+    return fail(getMinLengthMessage(DESCRIPTION_LIMIT.min));
+  }
+  if (descriptionLengthValidation.isOverMax) {
+    return fail(getMaxLengthMessage(DESCRIPTION_LIMIT.max));
   }
 
-  const guidelines = eventDetailForm.guidelines.trim();
-  if (guidelines.length < DETAIL_TEXT_MIN_LENGTH || guidelines.length > DETAIL_TEXT_MAX_LENGTH) {
-    return fail(
-      `유의사항은 ${DETAIL_TEXT_MIN_LENGTH}자 이상 ${DETAIL_TEXT_MAX_LENGTH}자 이하로 입력해주세요.`,
-    );
+  const guidelinesLengthValidation = validateTextLength(
+    eventDetailForm.guidelines,
+    GUIDELINES_LIMIT,
+  );
+  if (guidelinesLengthValidation.isUnderMin) {
+    return fail(getMinLengthMessage(GUIDELINES_LIMIT.min));
+  }
+  if (guidelinesLengthValidation.isOverMax) {
+    return fail(getMaxLengthMessage(GUIDELINES_LIMIT.max));
   }
 
   if (!eventRecruitForm.recruitEndDateTime) {
@@ -407,8 +434,21 @@ export function buildCreateEventRequestBody({
   }
 
   const trimmedCateringDetail = eventTargetForm.cateringDetail.trim();
-  if (eventTargetForm.saleType === "CATERING" && !trimmedCateringDetail) {
-    return fail();
+  if (eventTargetForm.saleType === "CATERING") {
+    if (!trimmedCateringDetail) {
+      return fail();
+    }
+
+    const cateringLengthValidation = validateTextLength(
+      eventTargetForm.cateringDetail,
+      CATERING_DETAIL_LIMIT,
+    );
+    if (cateringLengthValidation.isUnderMin) {
+      return fail(getMinLengthMessage(CATERING_DETAIL_LIMIT.min));
+    }
+    if (cateringLengthValidation.isOverMax) {
+      return fail(getMaxLengthMessage(CATERING_DETAIL_LIMIT.max));
+    }
   }
 
   return {
@@ -442,8 +482,8 @@ export function buildCreateEventRequestBody({
           : {}),
       },
       eventDetailDto: {
-        description,
-        guidelines,
+        description: eventDetailForm.description.trim(),
+        guidelines: eventDetailForm.guidelines.trim(),
         contact: eventDetailForm.contact.trim(),
         electricitySupportAvailability: eventDetailForm.electricitySupportAvailability,
         generatorRequirement: eventDetailForm.generatorRequirement,

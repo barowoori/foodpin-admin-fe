@@ -13,6 +13,7 @@ export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   expectedParticipants: "UNDECIDED",
   fileIdList: [],
   photoFiles: [],
+  photoPaths: [],
   regionDo: "",
   regionSi: "",
   recruitmentUrl: "",

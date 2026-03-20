@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../components";
 import {
@@ -7,17 +8,25 @@ import {
   EventRecruitmentUrlInfo,
   EventTargetInfo,
 } from "../components/form";
-import { Header } from "../shared";
+import { Header, Modal } from "../shared";
 import { useEventDelete } from "./eventForm/useEventDelete";
 import { useEventDetailHydration } from "./eventForm/useEventDetailHydration";
 import { useEventFormState } from "./eventForm/useEventFormState";
 import { useEventFormSubmit } from "./eventForm/useEventFormSubmit";
 import { useEventSectionUpdate } from "./eventForm/useEventSectionUpdate";
+import { isCreateEventTextLengthValid } from "./eventForm/textLengthValidation";
 
 type EventSection = "info" | "recruit" | "target" | "detail" | "url";
+const PAGE_SECONDARY_BUTTON_CLASS =
+  "h-14 min-w-32 rounded-none border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]";
+const PAGE_PRIMARY_BUTTON_CLASS =
+  "h-14 min-w-32 rounded-none border-[#6f8198] bg-[#5f738a] text-[15px] font-semibold text-white hover:bg-[#6b819b]";
 
 function EventFormPage() {
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCreateSubmitAttempted, setIsCreateSubmitAttempted] = useState(false);
 
   const {
     baseInfoForm,
@@ -44,6 +53,32 @@ function EventFormPage() {
   });
 
   const { isDeletePending, handleDelete } = useEventDelete({ eventId });
+
+  const isCreateTextLengthValid = useMemo(
+    () =>
+      isCreateEventTextLengthValid({
+        name: baseInfoForm.name,
+        saleType: eventTargetForm.saleType,
+        cateringDetail: eventTargetForm.cateringDetail,
+        description: eventDetailForm.description,
+        guidelines: eventDetailForm.guidelines,
+      }),
+    [
+      baseInfoForm.name,
+      eventDetailForm.description,
+      eventDetailForm.guidelines,
+      eventTargetForm.cateringDetail,
+      eventTargetForm.saleType,
+    ],
+  );
+  const isCreateSubmitDisabled = isPending || !isCreateTextLengthValid;
+
+  const handleDeleteConfirm = async () => {
+    const isDeleted = await handleDelete();
+    if (isDeleted) {
+      setIsDeleteModalOpen(false);
+    }
+  };
 
   const {
     isInfoUpdating,
@@ -169,6 +204,7 @@ function EventFormPage() {
             <EventBaseInfo
               value={baseInfoForm}
               onChange={handleBaseInfoChange}
+              showNameValidationError={!isDetailMode && isCreateSubmitAttempted}
               onPeriodTimeChange={handlePeriodTimeChange}
             />
             {renderSectionEditButton("info")}
@@ -192,6 +228,9 @@ function EventFormPage() {
             <EventTargetInfo
               value={eventTargetForm}
               onChange={handleTargetInfoChange}
+              showCateringValidationError={
+                !isDetailMode && isCreateSubmitAttempted
+              }
             />
             {renderSectionEditButton("target")}
           </section>
@@ -203,6 +242,7 @@ function EventFormPage() {
             <EventDetailInfo
               value={eventDetailForm}
               onChange={handleDetailInfoChange}
+              showTextValidationError={!isDetailMode && isCreateSubmitAttempted}
             />
             {renderSectionEditButton("detail")}
           </section>
@@ -223,35 +263,116 @@ function EventFormPage() {
           {isDetailMode ? (
             <div className="flex items-center justify-center gap-2 pt-2">
               <Button
-                onClick={handleDelete}
+                onClick={() => setIsDeleteModalOpen(true)}
                 disabled={isDeletePending}
-                className="h-14 min-w-32 rounded-none border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+                className={PAGE_SECONDARY_BUTTON_CLASS}
               >
                 {isDeletePending ? "삭제 중.." : "삭제"}
               </Button>
               <Button
                 onClick={() => navigate("/events")}
-                className="h-14 min-w-32 rounded-none border-[#cccccc] bg-[#efefef] text-[15px] font-semibold text-[#666666] hover:bg-[#e4e4e4]"
+                className={PAGE_SECONDARY_BUTTON_CLASS}
               >
                 목록
               </Button>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <Button
-                onClick={handleSubmit}
-                disabled={isPending}
-                className="min-w-28 bg-[#5f738a] hover:bg-[#6b819b]"
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <div
+                onMouseDownCapture={() => setIsCreateSubmitAttempted(true)}
+                onTouchStartCapture={() => setIsCreateSubmitAttempted(true)}
               >
-                {isPending ? "등록 중.." : "등록"}
-              </Button>
-              <Button onClick={() => navigate("/events")} className="min-w-28">
+                <Button
+                  onClick={() => {
+                    if (!isCreateTextLengthValid) {
+                      return;
+                    }
+
+                    void handleSubmit();
+                  }}
+                  disabled={isCreateSubmitDisabled}
+                  className={PAGE_PRIMARY_BUTTON_CLASS}
+                >
+                  {isPending ? "등록 중.." : "등록"}
+                </Button>
+              </div>
+              <Button
+                onClick={() => setIsCancelModalOpen(true)}
+                className={PAGE_SECONDARY_BUTTON_CLASS}
+              >
                 취소
               </Button>
             </div>
           )}
         </div>
       </div>
+
+      {isDetailMode && isDeleteModalOpen ? (
+        <Modal
+          onClick={() => setIsDeleteModalOpen(false)}
+          className="max-w-150 border-[#4a505a] bg-[#2b3038] px-8 py-8"
+        >
+          <div className="w-full max-w-120">
+            <Modal.Header className="justify-center pt-2 pb-2 text-[26px] font-bold text-[#f3f6fb]">
+              행사 삭제
+            </Modal.Header>
+            <Modal.Description className="mt-2 text-center text-[16px] font-medium text-[#d5dce6]">
+              행사를 삭제하시겠습니까?
+            </Modal.Description>
+            <Modal.ButtonLayout className="mt-8 gap-4">
+              <Button
+                onClick={handleDeleteConfirm}
+                disabled={isDeletePending}
+                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[16px] font-semibold text-white hover:bg-[#6f859f]"
+              >
+                {isDeletePending ? "삭제 중.." : "확인"}
+              </Button>
+              <Button
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeletePending}
+                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[16px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
+              >
+                취소
+              </Button>
+            </Modal.ButtonLayout>
+          </div>
+        </Modal>
+      ) : null}
+
+      {!isDetailMode && isCancelModalOpen ? (
+        <Modal
+          onClick={() => setIsCancelModalOpen(false)}
+          className="max-w-150 border-[#4a505a] bg-[#2b3038] px-8 py-8"
+        >
+          <div className="w-full max-w-120">
+            <Modal.Header className="justify-center pt-2 pb-2 text-[26px] font-bold text-[#f3f6fb]">
+              등록 취소
+            </Modal.Header>
+            <Modal.Description className="mt-2 text-center text-[15px] leading-6 font-medium text-[#d5dce6]">
+              입력 중인 내용이 저장되지 않습니다.
+              {"\n"}
+              목록으로 이동하시겠습니까?
+            </Modal.Description>
+            <Modal.ButtonLayout className="mt-8 gap-4">
+              <Button
+                onClick={() => {
+                  setIsCancelModalOpen(false);
+                  navigate("/events");
+                }}
+                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[16px] font-semibold text-white hover:bg-[#6f859f]"
+              >
+                확인
+              </Button>
+              <Button
+                onClick={() => setIsCancelModalOpen(false)}
+                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[16px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
+              >
+                취소
+              </Button>
+            </Modal.ButtonLayout>
+          </div>
+        </Modal>
+      ) : null}
     </div>
   );
 }
