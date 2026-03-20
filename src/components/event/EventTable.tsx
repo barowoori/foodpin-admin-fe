@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Pagination, TableCountControl } from "../../components";
 import type { EventTableRow } from "../../types";
+import { useNavigate } from "react-router";
 
 type EventTableProps = {
   items: EventTableRow[];
@@ -36,6 +37,7 @@ function EventTable({
     Record<string, boolean>
   >({});
   const [togglingById, setTogglingById] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
 
   const handleToggleFoExposure = async (
     id: string,
@@ -77,7 +79,7 @@ function EventTable({
           onPageSizeChange={onPageSizeChange}
         />
 
-        <Button>등록</Button>
+        <Button onClick={() => navigate("/events/form")}>등록</Button>
       </div>
 
       <div className="overflow-x-auto">

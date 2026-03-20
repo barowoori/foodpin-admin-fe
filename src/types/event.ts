@@ -113,3 +113,76 @@ export interface BaseInfoFormState {
   applyTimeToAll: boolean;
   periodTimeByDate: Record<string, EventDateTime>;
 }
+
+export interface EventRecruitFormState {
+  recruitEndDateTime: string;
+  recruitCount: number;
+  isFullAttendanceRequired: boolean;
+  isRecruitEndOnSelection: boolean;
+}
+
+export type TruckType = "SNACK" | "MEAL" | "STREET_FOOD" | "CAFE";
+
+export type SaleType = "NORMAL" | "CATERING";
+
+export type PriceRange =
+  | "UNDER_7000"
+  | "UNDER_10000"
+  | "UNDER_12000"
+  | "UNDER_15000"
+  | "OVER_15000"
+  | "UNLIMITED";
+
+export interface EventTargetFormState {
+  truckTypes: TruckType[];
+  eventCategoryCodeList: string[];
+  saleType: SaleType;
+  priceRange: PriceRange;
+  cateringDetail: string;
+}
+
+export interface EventDetailFormState {
+  description: string;
+  guidelines: string;
+  contact: string;
+  electricitySupportAvailability: boolean;
+  generatorRequirement: boolean;
+}
+
+export interface EventDateRequestDto {
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+export interface EventCreateRequestBody {
+  eventInfoDto: {
+    name: string;
+    type: EventType;
+    expectedParticipants: ExpectedParticipants;
+    fileIdList: string[];
+    regionCode: string;
+    eventDateDtoList: EventDateRequestDto[];
+    recruitmentUrl: string;
+  };
+  eventRecruitDto: {
+    recruitEndDateTime: string;
+    recruitCount: number;
+    isFullAttendanceRequired: boolean;
+    isRecruitEndOnSelection: boolean;
+  };
+  eventTargetDto: {
+    truckTypes: TruckType[];
+    eventCategoryCodeList: string[];
+    saleType: SaleType;
+    priceRange: PriceRange;
+    cateringDetail: string;
+  };
+  eventDetailDto: {
+    description: string;
+    guidelines: string;
+    contact: string;
+    electricitySupportAvailability: boolean;
+    generatorRequirement: boolean;
+  };
+}

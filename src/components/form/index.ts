@@ -1,4 +1,9 @@
 export { default as FormBox } from "./FormBox";
 export { default as FormInput } from "./FormInput";
+export { default as FormTextArea } from "./FormTextArea";
+export { default as EventBaseInfo } from "./EventBaseInfo";
 export { default as BaseInfoEventDateField } from "./BaseInfoEventDateField";
 export { default as ParticipantCountRadioGroup } from "./ParticipantCountRadioGroup";
+export { default as EventRecruitInfo } from "./EventRecruitInfo";
+export { default as EventTargetInfo } from "./EventTargetInfo";
+export { default as EventDetailInfo } from "./EventDetailInfo";

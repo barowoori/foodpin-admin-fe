@@ -1,4 +1,10 @@
-import type { BaseInfoFormState, EventDateTime } from "../types";
+import type {
+  BaseInfoFormState,
+  EventDateTime,
+  EventDetailFormState,
+  EventRecruitFormState,
+  EventTargetFormState,
+} from "../types";
 import { getIsoDateRange } from "./dateRange";
 
 export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
@@ -16,6 +22,29 @@ export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   periodEndDate: "",
   applyTimeToAll: false,
   periodTimeByDate: {},
+};
+
+export const INITIAL_EVENT_FORM_RECRUIT: EventRecruitFormState = {
+  recruitEndDateTime: "",
+  recruitCount: 0,
+  isFullAttendanceRequired: true,
+  isRecruitEndOnSelection: true,
+};
+
+export const INITIAL_EVENT_FORM_TARGET: EventTargetFormState = {
+  truckTypes: [],
+  eventCategoryCodeList: [],
+  saleType: "NORMAL",
+  priceRange: "UNDER_7000",
+  cateringDetail: "",
+};
+
+export const INITIAL_EVENT_FORM_DETAIL: EventDetailFormState = {
+  description: "",
+  guidelines: "",
+  contact: "",
+  electricitySupportAvailability: true,
+  generatorRequirement: true,
 };
 
 function createEmptyTimeSlot(): EventDateTime {
