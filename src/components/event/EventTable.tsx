@@ -156,7 +156,7 @@ function EventTable({
                           event.stopPropagation();
                           void handleToggleFoExposure(row.id, currentIsHidden);
                         }}
-                        className={`focus-visible:ring-focus-ring/40 relative inline-flex h-6 w-11 items-center rounded-full border p-0.5 transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
+                        className={`focus-visible:ring-focus-ring/40 relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full border p-0.5 transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
                           isFoExposed
                             ? "border-[#6F8198] bg-[#5F738A]"
                             : "border-border-control bg-bg-control"

@@ -5,5 +5,6 @@ export { default as EventBaseInfo } from "./EventBaseInfo";
 export { default as BaseInfoEventDateField } from "./BaseInfoEventDateField";
 export { default as ParticipantCountRadioGroup } from "./ParticipantCountRadioGroup";
 export { default as EventRecruitInfo } from "./EventRecruitInfo";
+export { default as EventRecruitmentUrlInfo } from "./EventRecruitmentUrlInfo";
 export { default as EventTargetInfo } from "./EventTargetInfo";
 export { default as EventDetailInfo } from "./EventDetailInfo";

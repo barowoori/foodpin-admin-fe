@@ -51,6 +51,23 @@ const PRICE_RANGES: PriceRange[] = [
   "NO_MATTER",
 ];
 
+const EVENT_CATEGORY_CODE_MAP: Record<string, string> = {
+  KOREAN: "C01",
+  WESTERN: "C02",
+  JAPANESE: "C03",
+  CHINESE: "C04",
+  SNACK: "C05",
+  WORLD: "C06",
+  ETC: "C07",
+  C01: "C01",
+  C02: "C02",
+  C03: "C03",
+  C04: "C04",
+  C05: "C05",
+  C06: "C06",
+  C07: "C07",
+};
+
 const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
 const DETAIL_TEXT_MIN_LENGTH = 10;
 const DETAIL_TEXT_MAX_LENGTH = 10000;
@@ -75,6 +92,23 @@ export type BuildCreateEventRequestBodyResult =
       requestBody: null;
       errorMessage: string;
     };
+
+function normalizeEventCategoryCode(code: string) {
+  const normalized = code.trim().toUpperCase();
+  if (!normalized) {
+    return "";
+  }
+
+  if (/^C\d{2}$/.test(normalized)) {
+    return normalized;
+  }
+
+  return EVENT_CATEGORY_CODE_MAP[normalized] ?? normalized;
+}
+
+export function normalizeEventCategoryCodes(codes: string[]) {
+  return [...new Set(codes.map(normalizeEventCategoryCode).filter(Boolean))];
+}
 
 function normalizeTimeValue(value: string) {
   if (!value) {
@@ -396,7 +430,9 @@ export function buildCreateEventRequestBody({
       },
       eventTargetDto: {
         truckTypes: eventTargetForm.truckTypes,
-        eventCategoryCodeList: eventTargetForm.eventCategoryCodeList,
+        eventCategoryCodeList: normalizeEventCategoryCodes(
+          eventTargetForm.eventCategoryCodeList,
+        ),
         saleType: eventTargetForm.saleType,
         ...(eventTargetForm.saleType === "NORMAL" && eventTargetForm.priceRange
           ? { priceRange: eventTargetForm.priceRange }
