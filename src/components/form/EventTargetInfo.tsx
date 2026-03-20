@@ -1,15 +1,23 @@
+import { useEffect, useState } from "react";
 import type {
   EventTargetFormState,
   PriceRange,
   SaleType,
   TruckType,
 } from "../../types";
+import {
+  CATERING_DETAIL_LIMIT,
+  getMaxLengthMessage,
+  getMinLengthMessage,
+  validateTextLength,
+} from "../../pages/eventForm/textLengthValidation";
 import FormBox from "./FormBox";
-import FormInput from "./FormInput";
+import FormTextArea from "./FormTextArea";
 
 type EventTargetInfoProps = {
   value: EventTargetFormState;
   onChange: (patch: Partial<EventTargetFormState>) => void;
+  showCateringValidationError?: boolean;
 };
 
 type Option<T extends string> = {
@@ -57,9 +65,33 @@ function toggleListItem<T extends string>(list: T[], target: T): T[] {
 const TOGGLE_BUTTON_BASE_CLASS =
   "border-border-control bg-bg-app text-fg-subtle hover:bg-bg-control hover:text-fg-secondary peer-checked:border-[#73879d] peer-checked:bg-[#50647a] peer-checked:text-[#f3f6fa] peer-focus-visible:border-focus-ring peer-focus-visible:ring-focus-ring/40 inline-flex h-11 cursor-pointer items-center justify-center rounded-md border text-[15px] font-semibold transition-colors peer-focus-visible:ring-2";
 
-function EventTargetInfo({ value, onChange }: EventTargetInfoProps) {
+function EventTargetInfo({
+  value,
+  onChange,
+  showCateringValidationError = false,
+}: EventTargetInfoProps) {
   const isCateringSaleType = value.saleType === "CATERING";
   const isNormalSaleType = value.saleType === "NORMAL";
+  const [isCateringTouched, setIsCateringTouched] = useState(false);
+  const [isCateringMaxExceeded, setIsCateringMaxExceeded] = useState(false);
+  const cateringValidation = validateTextLength(
+    value.cateringDetail,
+    CATERING_DETAIL_LIMIT,
+  );
+  const showCateringMinError =
+    isCateringSaleType &&
+    (isCateringTouched || showCateringValidationError) &&
+    cateringValidation.isUnderMin;
+  const showCateringMaxError =
+    isCateringSaleType &&
+    (isCateringMaxExceeded || cateringValidation.isOverMax);
+
+  useEffect(() => {
+    if (!isCateringSaleType) {
+      setIsCateringTouched(false);
+      setIsCateringMaxExceeded(false);
+    }
+  }, [isCateringSaleType]);
 
   return (
     <FormBox>
@@ -159,17 +191,48 @@ function EventTargetInfo({ value, onChange }: EventTargetInfoProps) {
       </FormBox.Row>
 
       <FormBox.Row label="요청사항">
-        <FormInput
-          value={value.cateringDetail}
-          onChange={(event) => onChange({ cateringDetail: event.target.value })}
-          placeholder={
-            isCateringSaleType
-              ? "케이터링 상세 요청사항"
-              : "케이터링 선택 시 입력 가능합니다."
-          }
-          disabled={!isCateringSaleType}
-          className="w-full max-w-160 disabled:cursor-not-allowed disabled:border-border-control/60 disabled:bg-bg-app disabled:text-fg-muted disabled:placeholder:text-fg-muted/80 disabled:opacity-80"
-        />
+        <div className="w-full max-w-180">
+          <div className="relative">
+            <FormTextArea
+              value={value.cateringDetail}
+              onChange={(event) => {
+                const next = event.target.value;
+                if (next.length > CATERING_DETAIL_LIMIT.max) {
+                  setIsCateringMaxExceeded(true);
+                  return;
+                }
+
+                setIsCateringMaxExceeded(false);
+                onChange({ cateringDetail: next });
+              }}
+              onBlur={() => setIsCateringTouched(true)}
+              placeholder={
+                isCateringSaleType
+                  ? "케이터링 상세 요청사항"
+                  : "케이터링 선택 시 입력 가능합니다."
+              }
+              disabled={!isCateringSaleType}
+              className="min-h-24 resize-y pr-20 pb-7 disabled:cursor-not-allowed disabled:border-border-control/60 disabled:bg-bg-app disabled:text-fg-muted disabled:placeholder:text-fg-muted/80 disabled:opacity-80"
+            />
+            <span
+              className={`pointer-events-none absolute right-3 bottom-2 text-[12px] ${
+                showCateringMaxError ? "text-[#ff5c5c]" : "text-fg-muted"
+              } ${!isCateringSaleType ? "opacity-60" : ""}`}
+            >
+              {cateringValidation.length} / {CATERING_DETAIL_LIMIT.max}
+            </span>
+          </div>
+          {showCateringMaxError ? (
+            <p className="mt-1 text-[12px] text-[#ff5c5c]">
+              {getMaxLengthMessage(CATERING_DETAIL_LIMIT.max)}
+            </p>
+          ) : null}
+          {!showCateringMaxError && showCateringMinError ? (
+            <p className="mt-1 text-[12px] text-[#ff5c5c]">
+              {getMinLengthMessage(CATERING_DETAIL_LIMIT.min)}
+            </p>
+          ) : null}
+        </div>
       </FormBox.Row>
     </FormBox>
   );
