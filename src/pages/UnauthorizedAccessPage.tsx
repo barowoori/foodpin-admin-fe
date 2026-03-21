@@ -1,5 +1,5 @@
+import { Button } from "../components";
 import { useNavigate } from "react-router";
-import { Modal } from "../shared";
 
 function UnauthorizedAccessPage() {
   const navigate = useNavigate();
@@ -9,33 +9,27 @@ function UnauthorizedAccessPage() {
   };
 
   return (
-    <>
-      <div className="bg-bg-app min-h-dvh w-full" />
-      <Modal
-        closeOnBackdrop={false}
-        className="max-w-150 border-[#e5e7eb] bg-white px-8 py-8 text-[#2d3138]"
-      >
-        <div className="w-full max-w-120 text-center">
-          <Modal.Header className="justify-center pt-1 pb-2 text-[30px] font-semibold tracking-[-0.01em] text-[#2d3138]">
-            접근 권한이 없습니다
-          </Modal.Header>
-          <Modal.Description className="mt-4 text-center text-[25px] leading-6 font-medium text-[#616773]">
-            현재 계정은 관리자 권한이 없어 서비스에 접근할 수 없습니다.
-            {"\n"}
-            권한이 필요하면 관리자에게 문의해주세요.
-          </Modal.Description>
-          <Modal.ButtonLayout className="mt-8 px-0 pb-0">
-            <button
-              type="button"
-              onClick={handleMoveToLogin}
-              className="w-full cursor-pointer rounded-lg bg-[#eef0f3] px-4 py-3 text-[28px] font-semibold text-[#2b313b] transition-colors hover:bg-[#e4e8ee] active:bg-[#dbe0e8]"
-            >
-              로그인 화면으로 이동
-            </button>
-          </Modal.ButtonLayout>
+    <div className="bg-bg-app font-pretendard flex min-h-dvh items-center justify-center px-4 py-4">
+      <div className="border-border-control bg-bg-control w-full max-w-100 rounded-md border px-6 py-6 text-center shadow-[0_14px_30px_rgba(0,0,0,0.42)]">
+        <h1 className="text-fg-primary text-[26px] font-semibold tracking-[-0.01em]">
+          접근 권한이 없습니다
+        </h1>
+
+        <p className="text-fg-subtle mt-2 text-[14px] leading-7 font-medium whitespace-pre-line">
+          현재 계정은 관리자 권한이 없어 서비스에 접근할 수 {"\n"}없습니다.
+          권한이 필요하면 관리자에게 문의해주세요.
+        </p>
+
+        <div className="mt-5 flex justify-center">
+          <Button
+            onClick={handleMoveToLogin}
+            className="border-focus-ring h-10 w-full max-w-72 min-w-0 bg-[#5f738a] text-[17px] font-semibold text-[#f3f6fa] hover:bg-[#6f859f] active:bg-[#556981]"
+          >
+            로그인 화면으로 이동
+          </Button>
         </div>
-      </Modal>
-    </>
+      </div>
+    </div>
   );
 }
 
