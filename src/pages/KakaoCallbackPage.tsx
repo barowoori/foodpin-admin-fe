@@ -1,7 +1,37 @@
+import { isAxiosError } from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { loginWithKakaoCode } from "../apis";
 import { useAuthStore } from "../stores";
+
+function isUnauthorizedLoginError(error: unknown) {
+  if (!isAxiosError(error)) {
+    return false;
+  }
+
+  if (error.response?.status === 403) {
+    return true;
+  }
+
+  const responseData = error.response?.data;
+
+  if (!responseData || typeof responseData !== "object" || !("message" in responseData)) {
+    return false;
+  }
+
+  const { message } = responseData as { message?: unknown };
+
+  if (typeof message !== "string") {
+    return false;
+  }
+
+  return (
+    message.includes("권한") ||
+    message.includes("접근") ||
+    message.toLowerCase().includes("forbidden") ||
+    message.toLowerCase().includes("unauthorized")
+  );
+}
 
 function KakaoCallbackPage() {
   const navigate = useNavigate();
@@ -42,8 +72,13 @@ function KakaoCallbackPage() {
 
           throw new Error("토큰 저장에 실패했습니다.");
         }
-      } catch {
+      } catch (error) {
         if (!isCancelled) {
+          if (isUnauthorizedLoginError(error)) {
+            navigate("/unauthorized", { replace: true });
+            return;
+          }
+
           navigate("/login", { replace: true });
         }
       }

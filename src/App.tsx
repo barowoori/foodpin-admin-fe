@@ -6,6 +6,7 @@ import {
   EventManagementPage,
   KakaoCallbackPage,
   LoginPage,
+  UnauthorizedAccessPage,
 } from "./pages";
 import EventFormPage from "./pages/EventFormPage";
 import { scrollToTop } from "./utils";
@@ -27,6 +28,7 @@ function App() {
       <Routes>
         <Route path="/" element={<KakaoCallbackPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="unauthorized" element={<UnauthorizedAccessPage />} />
         <Route path="business" element={<ApprovalDashboardPage />} />
         <Route path="events" element={<EventManagementPage />} />
         <Route path="events/form" element={<EventFormPage />} />
