@@ -102,6 +102,13 @@ function BaseInfoEventDateField({
     () => getIsoDateRange(periodStartDate, periodEndDate),
     [periodStartDate, periodEndDate],
   );
+  const activeDates = useMemo(
+    () =>
+      mode === "PERIOD"
+        ? periodDates
+        : selectedDates.slice().sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [mode, periodDates, selectedDates],
+  );
   const selectedDatesLabel = selectedDates
     .slice()
     .sort()
@@ -367,9 +374,9 @@ function BaseInfoEventDateField({
         </div>
       </div>
 
-      {mode === "PERIOD" && periodDates.length > 0 ? (
+      {activeDates.length > 0 ? (
         <div className="mt-1 flex flex-col gap-2 pl-2">
-          {periodDates.map((date, index) => {
+          {activeDates.map((date, index) => {
             const currentTime = periodTimeByDate[date] ?? {
               startTime: "",
               endTime: "",

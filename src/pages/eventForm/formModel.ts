@@ -267,7 +267,7 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     periodStartDate: usePeriodMode ? sortedDates[0] ?? "" : "",
     periodEndDate: usePeriodMode ? sortedDates[sortedDates.length - 1] ?? "" : "",
     applyTimeToAll: false,
-    periodTimeByDate: usePeriodMode ? periodTimeByDate : {},
+    periodTimeByDate,
   };
 }
 
@@ -340,11 +340,15 @@ export function buildEventDateDtoList(baseInfoForm: BaseInfoFormState): EventDat
     });
   }
 
-  return baseInfoForm.selectedDates.map((date) => ({
-    date,
-    startTime: "00:00:00",
-    endTime: "00:00:00",
-  }));
+  return baseInfoForm.selectedDates.map((date) => {
+    const time = baseInfoForm.periodTimeByDate[date];
+
+    return {
+      date,
+      startTime: normalizeTimeValue(time?.startTime ?? ""),
+      endTime: normalizeTimeValue(time?.endTime ?? ""),
+    };
+  });
 }
 
 export function buildCreateEventRequestBody({
