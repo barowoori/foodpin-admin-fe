@@ -60,18 +60,14 @@ export function applyBaseInfoPatch(
   patch: Partial<BaseInfoFormState>,
 ): BaseInfoFormState {
   const next: BaseInfoFormState = { ...prev, ...patch };
-  const isDateInputUpdated =
-    Array.isArray(patch.selectedDates) && patch.selectedDates.length > 0;
+  const isDateInputUpdated = Array.isArray(patch.selectedDates);
   const isPeriodInputUpdated =
-    (typeof patch.periodStartDate === "string" &&
-      patch.periodStartDate.length > 0) ||
-    (typeof patch.periodEndDate === "string" && patch.periodEndDate.length > 0);
+    typeof patch.periodStartDate === "string" ||
+    typeof patch.periodEndDate === "string";
 
   if (isDateInputUpdated) {
     next.periodStartDate = "";
     next.periodEndDate = "";
-    next.applyTimeToAll = false;
-    next.periodTimeByDate = {};
   }
 
   if (isPeriodInputUpdated) {
@@ -86,20 +82,23 @@ export function applyBaseInfoPatch(
     next.periodEndDate = "";
   }
 
-  const periodDates = getIsoDateRange(next.periodStartDate, next.periodEndDate);
+  const activeDates =
+    next.eventDateMode === "PERIOD"
+      ? getIsoDateRange(next.periodStartDate, next.periodEndDate)
+      : [...new Set(next.selectedDates)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   const normalizedTimeByDate: Record<string, EventDateTime> = {};
 
-  periodDates.forEach((date) => {
+  activeDates.forEach((date) => {
     normalizedTimeByDate[date] = next.periodTimeByDate[date] ?? createEmptyTimeSlot();
   });
 
   next.periodTimeByDate = normalizedTimeByDate;
 
-  if (patch.applyTimeToAll && periodDates.length > 0) {
-    const firstDate = periodDates[0];
+  if (next.applyTimeToAll && activeDates.length > 0) {
+    const firstDate = activeDates[0];
     const firstTime = next.periodTimeByDate[firstDate] ?? createEmptyTimeSlot();
 
-    periodDates.forEach((date) => {
+    activeDates.forEach((date) => {
       next.periodTimeByDate[date] = { ...firstTime };
     });
   }
@@ -107,13 +106,17 @@ export function applyBaseInfoPatch(
   if (
     patch.applyTimeToAll === false &&
     prev.applyTimeToAll &&
-    periodDates.length > 0
+    activeDates.length > 0
   ) {
     const clearedTimeByDate: Record<string, EventDateTime> = {};
-    periodDates.forEach((date) => {
+    activeDates.forEach((date) => {
       clearedTimeByDate[date] = createEmptyTimeSlot();
     });
     next.periodTimeByDate = clearedTimeByDate;
+  }
+
+  if (activeDates.length === 0) {
+    next.applyTimeToAll = false;
   }
 
   return next;

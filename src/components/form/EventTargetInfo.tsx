@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type {
   EventTargetFormState,
   PriceRange,
@@ -33,13 +33,13 @@ const TRUCK_TYPE_OPTIONS: Array<Option<TruckType>> = [
 ];
 
 const EVENT_CATEGORY_OPTIONS = [
-  { value: "KOREAN", label: "한식" },
-  { value: "WESTERN", label: "양식" },
-  { value: "JAPANESE", label: "일식" },
-  { value: "CHINESE", label: "중식" },
-  { value: "SNACK", label: "분식" },
-  { value: "WORLD", label: "세계음식" },
-  { value: "ETC", label: "기타" },
+  { value: "C01", label: "한식" },
+  { value: "C02", label: "양식" },
+  { value: "C03", label: "일식" },
+  { value: "C04", label: "중식" },
+  { value: "C05", label: "분식" },
+  { value: "C06", label: "세계음식" },
+  { value: "C07", label: "기타" },
 ] as const;
 
 const SALE_TYPE_OPTIONS: Array<Option<SaleType>> = [
@@ -85,13 +85,6 @@ function EventTargetInfo({
   const showCateringMaxError =
     isCateringSaleType &&
     (isCateringMaxExceeded || cateringValidation.isOverMax);
-
-  useEffect(() => {
-    if (!isCateringSaleType) {
-      setIsCateringTouched(false);
-      setIsCateringMaxExceeded(false);
-    }
-  }, [isCateringSaleType]);
 
   return (
     <FormBox>
@@ -154,10 +147,16 @@ function EventTargetInfo({
                 name="saleType"
                 checked={value.saleType === option.value}
                 onChange={() =>
-                  onChange({
-                    saleType: option.value,
-                    ...(option.value === "CATERING" ? { priceRange: "" } : {}),
-                  })
+                  {
+                    if (option.value !== "CATERING") {
+                      setIsCateringTouched(false);
+                      setIsCateringMaxExceeded(false);
+                    }
+                    onChange({
+                      saleType: option.value,
+                      ...(option.value === "CATERING" ? { priceRange: "" } : {}),
+                    });
+                  }
                 }
                 className="border-border-control bg-bg-app accent-focus-ring h-4 w-4"
               />
