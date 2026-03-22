@@ -31,6 +31,10 @@ import {
   getMinLengthMessage,
   validateTextLength,
 } from "./textLengthValidation";
+import {
+  getMaxPhotoCountMessage,
+  MAX_EVENT_PHOTO_COUNT,
+} from "./photoValidation";
 
 const EVENT_TYPES: EventType[] = [
   "CORPORATE",
@@ -170,12 +174,14 @@ function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value
 }
 
 function resolveRegionSelection(regionCode: string) {
-  if (!regionCode) {
+  const normalizedCode = regionCode.trim();
+
+  if (!normalizedCode) {
     return { regionDo: "", regionSi: "" };
   }
 
-  if (regionCode.startsWith("DO")) {
-    return { regionDo: regionCode, regionSi: "" };
+  if (REGION_DO_OPTIONS.some((option) => option.value === normalizedCode)) {
+    return { regionDo: normalizedCode, regionSi: "" };
   }
 
   for (const regionDo of REGION_DO_OPTIONS) {
@@ -184,8 +190,8 @@ function resolveRegionSelection(regionCode: string) {
     }
 
     const regionSiOptions = getRegionSiOptions(regionDo.value);
-    if (regionSiOptions.some((option) => option.value === regionCode)) {
-      return { regionDo: regionDo.value, regionSi: regionCode };
+    if (regionSiOptions.some((option) => option.value === normalizedCode)) {
+      return { regionDo: regionDo.value, regionSi: normalizedCode };
     }
   }
 
@@ -277,16 +283,17 @@ function mapDetailToRecruit(detail: EventDetailData): EventRecruitFormState {
 
 function mapDetailToTarget(detail: EventDetailData): EventTargetFormState {
   const saleType = isOneOf(detail.saleType, SALE_TYPES) ? detail.saleType : "NORMAL";
+  const rawCategoryCodes =
+    detail.categories
+      ?.map((category) => category?.code)
+      .filter((code): code is string => typeof code === "string") ?? [];
 
   return {
     truckTypes:
       detail.truckTypes?.filter((truckType): truckType is TruckType =>
         isOneOf(truckType, TRUCK_TYPES),
       ) ?? [],
-    eventCategoryCodeList:
-      detail.categories
-        ?.map((category) => category?.code)
-        .filter((code): code is string => typeof code === "string") ?? [],
+    eventCategoryCodeList: normalizeEventCategoryCodes(rawCategoryCodes),
     saleType,
     priceRange:
       saleType === "NORMAL" && isOneOf(detail.priceRange, PRICE_RANGES)
@@ -353,6 +360,10 @@ export function buildCreateEventRequestBody({
 
   if (!baseInfoForm.name.trim()) {
     return fail();
+  }
+
+  if (baseInfoForm.fileIdList.length > MAX_EVENT_PHOTO_COUNT) {
+    return fail(getMaxPhotoCountMessage());
   }
 
   const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);

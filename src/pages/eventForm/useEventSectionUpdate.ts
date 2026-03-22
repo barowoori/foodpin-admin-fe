@@ -20,6 +20,10 @@ import type {
 } from "../../types";
 import { buildEventDateDtoList, normalizeEventCategoryCodes } from "./formModel";
 import {
+  getMaxPhotoCountMessage,
+  MAX_EVENT_PHOTO_COUNT,
+} from "./photoValidation";
+import {
   CATERING_DETAIL_LIMIT,
   DESCRIPTION_LIMIT,
   EVENT_NAME_LIMIT,
@@ -124,6 +128,11 @@ export function useEventSectionUpdate({
     const eventDateDtoList = buildEventDateDtoList(baseInfoForm);
     if (!regionCode || eventDateDtoList.length === 0) {
       alert(REQUIRED_VALIDATION_MESSAGE);
+      return;
+    }
+
+    if (baseInfoForm.fileIdList.length > MAX_EVENT_PHOTO_COUNT) {
+      alert(getMaxPhotoCountMessage());
       return;
     }
 

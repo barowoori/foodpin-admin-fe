@@ -10,6 +10,10 @@ import {
   getMinLengthMessage,
   validateTextLength,
 } from "../../pages/eventForm/textLengthValidation";
+import {
+  getMaxPhotoCountMessage,
+  MAX_EVENT_PHOTO_COUNT,
+} from "../../pages/eventForm/photoValidation";
 import BaseInfoEventDateField from "./BaseInfoEventDateField";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
@@ -60,31 +64,54 @@ function EventBaseInfo({
     () => value.photoFiles.map((file) => URL.createObjectURL(file)),
     [value.photoFiles],
   );
-  const photoPreviewUrls =
-    localPhotoPreviewUrls.length > 0 ? localPhotoPreviewUrls : value.photoPaths;
+  const photoPreviewUrls = useMemo(
+    () => [...value.photoPaths, ...localPhotoPreviewUrls],
+    [localPhotoPreviewUrls, value.photoPaths],
+  );
   const hasPhotoPreview = photoPreviewUrls.length > 0;
+  const isPhotoLimitReached = value.fileIdList.length >= MAX_EVENT_PHOTO_COUNT;
 
   const selectedPhotoLabel = useMemo(() => {
-    if (value.photoFiles.length > 0) {
-      if (value.photoFiles.length === 1) {
-        return value.photoFiles[0].name;
-      }
-
-      return `${value.photoFiles[0].name} 외 ${value.photoFiles.length - 1}개`;
-    }
-
     if (value.fileIdList.length > 0) {
       return `${value.fileIdList.length}개 파일 선택`;
     }
 
     return "선택된 파일 없음";
-  }, [value.fileIdList, value.photoFiles]);
+  }, [value.fileIdList]);
 
   useEffect(() => {
     return () => {
       localPhotoPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [localPhotoPreviewUrls]);
+
+  const handleRemovePhoto = (photoIndex: number) => {
+    const serverPhotoCount = value.photoPaths.length;
+    const serverFileIds = value.fileIdList.slice(0, serverPhotoCount);
+    const localFileIds = value.fileIdList.slice(serverPhotoCount);
+
+    if (photoIndex < serverPhotoCount) {
+      onChange({
+        photoPaths: value.photoPaths.filter((_, index) => index !== photoIndex),
+        photoFiles: value.photoFiles,
+        fileIdList: [
+          ...serverFileIds.filter((_, index) => index !== photoIndex),
+          ...localFileIds,
+        ],
+      });
+      return;
+    }
+
+    const localPhotoIndex = photoIndex - serverPhotoCount;
+    onChange({
+      photoPaths: value.photoPaths,
+      photoFiles: value.photoFiles.filter((_, index) => index !== localPhotoIndex),
+      fileIdList: [
+        ...serverFileIds,
+        ...localFileIds.filter((_, index) => index !== localPhotoIndex),
+      ],
+    });
+  };
 
   return (
     <FormBox className="overflow-visible">
@@ -97,9 +124,24 @@ function EventBaseInfo({
             multiple
             className="hidden"
             onChange={async (event) => {
-              const files = Array.from(event.target.files ?? []);
+              const selectedFiles = Array.from(event.target.files ?? []);
               event.target.value = "";
 
+              if (selectedFiles.length === 0) {
+                return;
+              }
+
+              const remainingCount = MAX_EVENT_PHOTO_COUNT - value.fileIdList.length;
+              if (remainingCount <= 0) {
+                alert(getMaxPhotoCountMessage());
+                return;
+              }
+
+              if (selectedFiles.length > remainingCount) {
+                alert(getMaxPhotoCountMessage());
+              }
+
+              const files = selectedFiles.slice(0, remainingCount);
               if (files.length === 0) {
                 return;
               }
@@ -111,9 +153,9 @@ function EventBaseInfo({
                   files.map((file) => saveFile(file)),
                 );
                 onChange({
-                  photoFiles: files,
-                  photoPaths: [],
-                  fileIdList: uploadedFileIds,
+                  photoFiles: [...value.photoFiles, ...files],
+                  photoPaths: value.photoPaths,
+                  fileIdList: [...value.fileIdList, ...uploadedFileIds],
                 });
               } catch (error) {
                 console.error("Failed to upload photos", error);
@@ -136,40 +178,38 @@ function EventBaseInfo({
                     alt={`행사 사진 ${index + 1}`}
                     className="h-full w-full object-cover"
                   />
-                  {index === 0 ? (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onChange({
-                          photoFiles: [],
-                          photoPaths: [],
-                          fileIdList: [],
-                        })
-                      }
-                      className="absolute top-1 right-1 grid h-6 w-6 cursor-pointer place-items-center rounded-full bg-black/65 text-[16px] leading-none font-medium text-white hover:bg-black/80"
-                      aria-label="이미지 삭제"
-                    >
-                      <span className="relative block h-3.5 w-3.5">
-                        <span className="absolute top-0 left-1/2 h-full w-[1.5px] -translate-x-1/2 rotate-45 bg-white" />
-                        <span className="absolute top-0 left-1/2 h-full w-[1.5px] -translate-x-1/2 -rotate-45 bg-white" />
-                      </span>
-                    </button>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePhoto(index)}
+                    className="absolute top-1 right-1 grid h-6 w-6 cursor-pointer place-items-center rounded-full bg-black/65 text-[16px] leading-none font-medium text-white hover:bg-black/80"
+                    aria-label={`이미지 ${index + 1} 삭제`}
+                  >
+                    <span className="relative block h-3.5 w-3.5">
+                      <span className="absolute top-0 left-1/2 h-full w-[1.5px] -translate-x-1/2 rotate-45 bg-white" />
+                      <span className="absolute top-0 left-1/2 h-full w-[1.5px] -translate-x-1/2 -rotate-45 bg-white" />
+                    </span>
+                  </button>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <FormInput readOnly value={selectedPhotoLabel} className="w-65" />
-              <Button
-                onClick={() => photoInputRef.current?.click()}
-                disabled={isPhotoUploading}
-                className="h-11 rounded-sm border-[#cfcfcf] bg-[#efefef] text-[#666666] hover:bg-[#e2e2e2]"
-              >
-                {isPhotoUploading ? "업로드 중.." : "파일 찾기"}
-              </Button>
-            </div>
-          )}
+          ) : null}
+          <div className="flex items-center gap-2">
+            <FormInput readOnly value={selectedPhotoLabel} className="w-65" />
+            <Button
+              onClick={() => photoInputRef.current?.click()}
+              disabled={isPhotoUploading || isPhotoLimitReached}
+              className="h-11 rounded-sm border-[#cfcfcf] bg-[#efefef] text-[#666666] hover:bg-[#e2e2e2]"
+            >
+              {isPhotoUploading
+                ? "업로드 중.."
+                : isPhotoLimitReached
+                  ? `최대 ${MAX_EVENT_PHOTO_COUNT}개`
+                  : "파일 찾기"}
+            </Button>
+          </div>
+          <p className="text-fg-muted text-xs">
+            이미지 최대 {MAX_EVENT_PHOTO_COUNT}개까지 등록할 수 있습니다.
+          </p>
         </div>
       </FormBox.Row>
 
