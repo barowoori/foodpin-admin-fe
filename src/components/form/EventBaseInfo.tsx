@@ -9,11 +9,11 @@ import {
   getMaxLengthMessage,
   getMinLengthMessage,
   validateTextLength,
-} from "../../pages/eventForm/textLengthValidation";
+} from "../../features/eventForm/textLengthValidation";
 import {
   getMaxPhotoCountMessage,
   MAX_EVENT_PHOTO_COUNT,
-} from "../../pages/eventForm/photoValidation";
+} from "../../features/eventForm/photoValidation";
 import BaseInfoEventDateField from "./BaseInfoEventDateField";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";

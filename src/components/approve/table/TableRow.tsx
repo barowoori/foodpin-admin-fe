@@ -210,6 +210,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
       <span
         className={`${STATUS_CLASS[item.status]} ${item.status === "REJECTED" ? "cursor-pointer" : ""}`}
         onClick={() => {
+          if (item.status === "APPROVED") return;
           setIsRejectModalOpen(true);
         }}
       >
