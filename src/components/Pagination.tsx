@@ -30,7 +30,7 @@ function Pagination({
   const isLastPage = currentPage >= totalPages - 1;
 
   const navButtonClass =
-    "inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors [&_path]:fill-fg-muted hover:[&_path]:fill-fg-primary disabled:cursor-not-allowed disabled:opacity-40";
+    "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors [&_path]:fill-fg-muted hover:[&_path]:fill-fg-primary disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div
@@ -63,7 +63,7 @@ function Pagination({
           <button
             type="button"
             key={pageNumber}
-            className={`h-10 min-w-10 rounded-lg border px-2 text-[20px] leading-none font-semibold transition-colors ${
+            className={`h-10 min-w-10 cursor-pointer rounded-lg border px-2 text-[20px] leading-none font-semibold transition-colors disabled:cursor-not-allowed ${
               isActive
                 ? "border-border-control bg-bg-control text-fg-primary"
                 : "text-fg-muted hover:border-border-control/60 hover:bg-bg-control/70 hover:text-fg-primary border-transparent"

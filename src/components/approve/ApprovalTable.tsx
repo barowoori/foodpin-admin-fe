@@ -4,7 +4,7 @@ import { TableHeaderWrapper } from "./table";
 import { TableRow } from "./table";
 
 const TABLE_GRID_CLASS =
-  "grid w-full grid-cols-[32px_62px_86px_104px_74px_minmax(74px,1fr)_68px_84px_70px_74px_74px_80px] items-center gap-x-[13px] text-center text-[13px] leading-tight [&>span]:min-w-0 [&>span]:truncate [&>span:nth-child(6)]:overflow-visible [&>span:nth-child(6)]:text-clip [&>span:nth-child(6)]:whitespace-normal [&>span:nth-child(6)]:break-all [&>span:nth-child(10)]:overflow-visible [&>span:nth-child(10)]:text-clip [&>span:nth-child(10)]:whitespace-normal [&>span:nth-child(11)]:overflow-visible [&>span:nth-child(11)]:text-clip [&>span:nth-child(11)]:whitespace-normal";
+  "grid w-full grid-cols-[32px_62px_86px_104px_74px_minmax(74px,1fr)_68px_84px_70px_74px_74px_80px] items-center gap-x-[13px] text-center text-[13px] leading-tight [&>span]:min-w-0 [&>span]:overflow-visible [&>span]:whitespace-normal [&>span]:break-all";
 
 type ApprovalTableProps = {
   items: ApprovalTableRow[];
