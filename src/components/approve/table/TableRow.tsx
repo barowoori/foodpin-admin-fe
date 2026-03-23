@@ -63,6 +63,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const isRejectedStatus = item.status === "REJECTED";
   const trimmedRejectionReason = rejectionReason.trim();
   const isRejectSubmitDisabled = trimmedRejectionReason.length === 0;
 
@@ -135,14 +136,14 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
                 <div className="bg-bg-control px-3 py-3">
                   <textarea
                     value={
-                      item.rejectionReason !== null
-                        ? item.rejectionReason
+                      isRejectedStatus
+                        ? (item.rejectionReason ?? "")
                         : rejectionReason
                     }
                     onChange={(event) =>
                       setRejectionReason(event.target.value.slice(0, 20))
                     }
-                    disabled={item.rejectionReason !== null}
+                    disabled={isRejectedStatus}
                     maxLength={20}
                     placeholder="반려 사유를 입력하세요"
                     className="border-border-control bg-bg-app text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-56 w-full resize-none border px-4 py-3 text-[16px] leading-6 outline-none focus:ring-2"
@@ -152,7 +153,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
             </div>
 
             <Modal.ButtonLayout className="mt-7 gap-4 px-0 pb-0">
-              {item.rejectionReason !== null ? (
+              {isRejectedStatus ? (
                 <Button
                   onClick={() => {
                     setIsRejectModalOpen(false);
@@ -211,6 +212,9 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
         className={`${STATUS_CLASS[item.status]} ${item.status === "REJECTED" ? "cursor-pointer" : ""}`}
         onClick={() => {
           if (item.status === "APPROVED") return;
+          if (item.status === "PENDING") {
+            setRejectionReason("");
+          }
           setIsRejectModalOpen(true);
         }}
       >
