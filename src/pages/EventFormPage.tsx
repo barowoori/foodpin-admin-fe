@@ -9,12 +9,12 @@ import {
   EventTargetInfo,
 } from "../components/form";
 import { Header, Modal } from "../shared";
-import { useEventDelete } from "./eventForm/useEventDelete";
-import { useEventDetailHydration } from "./eventForm/useEventDetailHydration";
-import { useEventFormState } from "./eventForm/useEventFormState";
-import { useEventFormSubmit } from "./eventForm/useEventFormSubmit";
-import { useEventSectionUpdate } from "./eventForm/useEventSectionUpdate";
-import { isCreateEventTextLengthValid } from "./eventForm/textLengthValidation";
+import { useEventDelete } from "../features/eventForm/useEventDelete";
+import { useEventDetailHydration } from "../features/eventForm/useEventDetailHydration";
+import { useEventFormState } from "../features/eventForm/useEventFormState";
+import { useEventFormSubmit } from "../features/eventForm/useEventFormSubmit";
+import { useEventSectionUpdate } from "../features/eventForm/useEventSectionUpdate";
+import { isCreateEventTextLengthValid } from "../features/eventForm/textLengthValidation";
 
 type EventSection = "info" | "recruit" | "target" | "detail" | "url";
 const PAGE_SECONDARY_BUTTON_CLASS =

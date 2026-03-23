@@ -10,7 +10,7 @@ import {
   getMaxLengthMessage,
   getMinLengthMessage,
   validateTextLength,
-} from "../../pages/eventForm/textLengthValidation";
+} from "../../features/eventForm/textLengthValidation";
 import FormBox from "./FormBox";
 import FormTextArea from "./FormTextArea";
 
