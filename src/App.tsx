@@ -1,14 +1,7 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect, type ReactElement } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router";
 import "./App.css";
-import {
-  ApprovalDashboardPage,
-  EventManagementPage,
-  KakaoCallbackPage,
-  LoginPage,
-  UnauthorizedAccessPage,
-} from "./pages";
-import EventFormPage from "./pages/EventFormPage";
+import { KakaoCallbackPage } from "./pages";
 import { scrollToTop } from "./utils";
 
 function ScrollToTopOnRouteChange() {
@@ -21,6 +14,19 @@ function ScrollToTopOnRouteChange() {
   return null;
 }
 
+const ApprovalDashboardPage = lazy(
+  () => import("./pages/ApprovalDashboardPage"),
+);
+const EventManagementPage = lazy(() => import("./pages/EventManagementPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const UnauthorizedAccessPage = lazy(
+  () => import("./pages/UnauthorizedAccessPage"),
+);
+const EventFormPage = lazy(() => import("./pages/EventFormPage"));
+
+const withSuspense = (element: ReactElement) => (
+  <Suspense fallback={null}>{element}</Suspense>
+);
 function App() {
   return (
     <BrowserRouter>
@@ -29,10 +35,16 @@ function App() {
         <Route path="/" element={<KakaoCallbackPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="unauthorized" element={<UnauthorizedAccessPage />} />
-        <Route path="business" element={<ApprovalDashboardPage />} />
-        <Route path="events" element={<EventManagementPage />} />
-        <Route path="events/form" element={<EventFormPage />} />
-        <Route path="events/form/:eventId" element={<EventFormPage />} />
+        <Route
+          path="business"
+          element={withSuspense(<ApprovalDashboardPage />)}
+        />
+        <Route path="events" element={withSuspense(<EventManagementPage />)} />
+        <Route path="events/form" element={withSuspense(<EventFormPage />)} />
+        <Route
+          path="events/form/:eventId"
+          element={withSuspense(<EventFormPage />)}
+        />
       </Routes>
     </BrowserRouter>
   );
