@@ -8,7 +8,6 @@ import type {
   EventRecruitFormState,
   EventTargetFormState,
   EventType,
-  ExpectedParticipants,
   PriceRange,
   SaleType,
   TruckType,
@@ -43,15 +42,6 @@ const EVENT_TYPES: EventType[] = [
   "LOCAL",
   "APARTMENT_MARKET",
   "CELEBRITY_SUPPORT",
-];
-
-const EXPECTED_PARTICIPANTS: ExpectedParticipants[] = [
-  "UNDECIDED",
-  "UNDER_50",
-  "UNDER_100",
-  "UNDER_150",
-  "UNDER_200",
-  "OVER_200",
 ];
 
 const TRUCK_TYPES: TruckType[] = ["SNACK", "MEAL", "STREET_FOOD", "COFFEE"];
@@ -247,9 +237,8 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     ...INITIAL_EVENT_FORM_BASE_INFO,
     name: detail.name ?? "",
     type: isOneOf(detail.type, EVENT_TYPES) ? detail.type : "",
-    expectedParticipants: isOneOf(detail.expectedParticipants, EXPECTED_PARTICIPANTS)
-      ? detail.expectedParticipants
-      : INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
+    expectedParticipants:
+      detail.expectedParticipants ?? INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
     fileIdList:
       detail.photos
         ?.map((photo) => photo?.id)

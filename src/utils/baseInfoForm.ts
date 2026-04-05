@@ -10,7 +10,7 @@ import { getIsoDateRange } from "./dateRange";
 export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   name: "",
   type: "",
-  expectedParticipants: "UNDECIDED",
+  expectedParticipants: "정보 없음",
   fileIdList: [],
   photoFiles: [],
   photoPaths: [],
@@ -85,11 +85,14 @@ export function applyBaseInfoPatch(
   const activeDates =
     next.eventDateMode === "PERIOD"
       ? getIsoDateRange(next.periodStartDate, next.periodEndDate)
-      : [...new Set(next.selectedDates)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+      : [...new Set(next.selectedDates)].sort((a, b) =>
+          a < b ? -1 : a > b ? 1 : 0,
+        );
   const normalizedTimeByDate: Record<string, EventDateTime> = {};
 
   activeDates.forEach((date) => {
-    normalizedTimeByDate[date] = next.periodTimeByDate[date] ?? createEmptyTimeSlot();
+    normalizedTimeByDate[date] =
+      next.periodTimeByDate[date] ?? createEmptyTimeSlot();
   });
 
   next.periodTimeByDate = normalizedTimeByDate;

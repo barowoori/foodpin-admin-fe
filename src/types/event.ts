@@ -70,20 +70,12 @@ export type EventType =
   | "APARTMENT_MARKET"
   | "CELEBRITY_SUPPORT";
 
-export type ExpectedParticipants =
-  | "UNDECIDED"
-  | "UNDER_50"
-  | "UNDER_100"
-  | "UNDER_150"
-  | "UNDER_200"
-  | "OVER_200";
-
 export type EventDateDto = Record<string, unknown>;
 
 export interface BaseInfoState {
   name: string;
   type: EventType;
-  expectedParticipants: ExpectedParticipants;
+  expectedParticipants: string;
   fileIdList?: string[];
   regionCode: string;
   eventDateDtoList: EventDateDto[];
@@ -100,7 +92,7 @@ export interface EventDateTime {
 export interface BaseInfoFormState {
   name: string;
   type: EventType | "";
-  expectedParticipants: ExpectedParticipants;
+  expectedParticipants: string;
   fileIdList: string[];
   photoFiles: File[];
   photoPaths: string[];
@@ -159,7 +151,7 @@ export interface EventCreateRequestBody {
   eventInfoDto: {
     name: string;
     type: EventType;
-    expectedParticipants: ExpectedParticipants;
+    expectedParticipants: string;
     fileIdList: string[];
     regionCode: string;
     eventDateDtoList: EventDateRequestDto[];
