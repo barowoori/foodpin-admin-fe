@@ -201,7 +201,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
         {item.imageUrls.length > 0 ? (
           <img
             src={item.imageUrls[0]}
-            className="cursor-pointer"
+            className="max-h-28 cursor-pointer"
             onClick={() => setIsImageModalOpen(true)}
           />
         ) : (
