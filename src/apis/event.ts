@@ -6,7 +6,6 @@ import type {
   EventItem,
   EventListResult,
   EventType,
-  ExpectedParticipants,
 } from "../types";
 
 type EventPageData = {
@@ -49,7 +48,7 @@ type EventCommandResponse = {
 export type UpdateEventInfoPayload = {
   name: string;
   type: EventType;
-  expectedParticipants: ExpectedParticipants;
+  expectedParticipants: string;
   fileIdList: string[];
   eventDateDtoList: EventDateRequestDto[];
   regionCode: string;

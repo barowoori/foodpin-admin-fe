@@ -18,7 +18,6 @@ import BaseInfoEventDateField from "./BaseInfoEventDateField";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
 import FormTextArea from "./FormTextArea";
-import ParticipantCountRadioGroup from "./ParticipantCountRadioGroup";
 
 const EVENT_CATEGORY_OPTIONS = [
   { value: "", label: "행사종류를 선택하세요" },
@@ -105,7 +104,9 @@ function EventBaseInfo({
     const localPhotoIndex = photoIndex - serverPhotoCount;
     onChange({
       photoPaths: value.photoPaths,
-      photoFiles: value.photoFiles.filter((_, index) => index !== localPhotoIndex),
+      photoFiles: value.photoFiles.filter(
+        (_, index) => index !== localPhotoIndex,
+      ),
       fileIdList: [
         ...serverFileIds,
         ...localFileIds.filter((_, index) => index !== localPhotoIndex),
@@ -131,7 +132,8 @@ function EventBaseInfo({
                 return;
               }
 
-              const remainingCount = MAX_EVENT_PHOTO_COUNT - value.fileIdList.length;
+              const remainingCount =
+                MAX_EVENT_PHOTO_COUNT - value.fileIdList.length;
               if (remainingCount <= 0) {
                 alert(getMaxPhotoCountMessage());
                 return;
@@ -306,13 +308,13 @@ function EventBaseInfo({
         </div>
       </FormBox.Row>
 
-      <FormBox.Row label="참여 인원" required>
-        <ParticipantCountRadioGroup
+      <FormBox.Row label="예상 규모">
+        <FormInput
+          maxLength={30}
           value={value.expectedParticipants}
-          onChange={(expectedParticipants) =>
-            onChange({ expectedParticipants })
+          onChange={(event) =>
+            onChange({ expectedParticipants: event.target.value })
           }
-          name="expected-participant-count"
         />
       </FormBox.Row>
     </FormBox>
