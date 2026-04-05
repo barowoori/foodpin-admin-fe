@@ -76,7 +76,7 @@ function ModalMain({
   return createPortal(
     <div className="fixed inset-0 z-50 bg-black/60">
       <div
-        className="flex min-h-full items-center justify-center p-4"
+        className="flex max-h-125 min-h-full items-center justify-center p-4"
         onClick={closeOnBackdrop ? onClick : undefined}
       >
         <div
@@ -99,4 +99,3 @@ const Modal = Object.assign(ModalMain, {
 });
 
 export default Modal;
-
