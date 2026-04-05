@@ -105,7 +105,7 @@ function TableRow({ item }: { item: ApprovalTableRow }) {
           <img
             src={item.imageUrls[0]}
             alt="사업자 등록증 이미지"
-            className="w-full max-w-180"
+            className="max-h-130 w-full max-w-180"
           />
           <div className="mt-6">
             <Modal.Cancled onClick={() => setIsImageModalOpen(false)}>
