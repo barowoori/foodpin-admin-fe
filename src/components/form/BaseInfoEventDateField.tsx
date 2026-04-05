@@ -36,29 +36,15 @@ function padTwoDigits(value: number) {
   return String(value).padStart(2, "0");
 }
 
-function normalizeTimeDraft(rawValue: string) {
-  const sanitized = rawValue.replace(/[^\d:]/g, "");
+const TIME_STEP_MINUTES = 1;
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => hour);
+const MINUTE_OPTIONS = Array.from(
+  { length: 60 / TIME_STEP_MINUTES },
+  (_, index) => index * TIME_STEP_MINUTES,
+);
 
-  if (sanitized.includes(":")) {
-    const [hourPart = "", minutePart = ""] = sanitized.split(":");
-    return `${hourPart.slice(0, 2)}:${minutePart.slice(0, 2)}`;
-  }
-
-  const digits = sanitized.replace(/\D/g, "").slice(0, 4);
-
-  if (digits.length <= 2) {
-    return digits;
-  }
-
-  if (digits.length === 3) {
-    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
-  }
-
-  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
-}
-
-function parseComplete24HourTime(value: string) {
-  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+function toMinutes(time: string) {
+  const match = time.match(/^(\d{2}):(\d{2})$/);
   if (!match) {
     return null;
   }
@@ -77,89 +63,184 @@ function parseComplete24HourTime(value: string) {
     return null;
   }
 
-  return `${padTwoDigits(hours)}:${padTwoDigits(minutes)}`;
+  return hours * 60 + minutes;
 }
 
-function toClamped24HourTime(value: string) {
-  if (!value.trim()) {
-    return "";
-  }
-
-  const normalized = normalizeTimeDraft(value);
-  const completeTime = parseComplete24HourTime(normalized);
-  if (completeTime) {
-    return completeTime;
-  }
-
-  const digits = normalized.replace(/\D/g, "").slice(0, 4);
-  if (!digits) {
-    return "";
-  }
-
-  let hours: number;
-  let minutes: number;
-
-  if (digits.length <= 2) {
-    hours = Number(digits);
-    minutes = 0;
-  } else if (digits.length === 3) {
-    hours = Number(digits.slice(0, 2));
-    minutes = Number(digits.slice(2)) * 10;
-  } else {
-    hours = Number(digits.slice(0, 2));
-    minutes = Number(digits.slice(2));
-  }
-
-  const clampedHours = Math.min(
-    23,
-    Math.max(0, Number.isNaN(hours) ? 0 : hours),
-  );
-  const clampedMinutes = Math.min(
-    59,
-    Math.max(0, Number.isNaN(minutes) ? 0 : minutes),
-  );
-  return `${padTwoDigits(clampedHours)}:${padTwoDigits(clampedMinutes)}`;
-}
-
-type TimeInputFieldProps = {
+type TimePickerFieldProps = {
   value: string;
   onChange: (value: string) => void;
+  minTime?: string;
 };
 
-function TimeInputField({ value, onChange }: TimeInputFieldProps) {
-  const [draftValue, setDraftValue] = useState(value);
+function TimePickerField({ value, onChange, minTime }: TimePickerFieldProps) {
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState<"HOUR" | "MINUTE">("HOUR");
+  const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const minMinutes = useMemo(() => toMinutes(minTime ?? ""), [minTime]);
+
+  const closePicker = () => {
+    setIsOpen(false);
+    setStep("HOUR");
+    setSelectedHour(null);
+  };
 
   useEffect(() => {
-    setDraftValue(value);
-  }, [value]);
+    const handleOutsidePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!target || !pickerRef.current) {
+        return;
+      }
+
+      if (!pickerRef.current.contains(target)) {
+        setIsOpen(false);
+        setStep("HOUR");
+        setSelectedHour(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsidePointerDown);
+    document.addEventListener("touchstart", handleOutsidePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsidePointerDown);
+      document.removeEventListener("touchstart", handleOutsidePointerDown);
+    };
+  }, []);
+
+  const isHourDisabled = (hour: number) => {
+    if (minMinutes === null) {
+      return false;
+    }
+
+    const latestMinuteInHour = hour * 60 + 59;
+    return latestMinuteInHour < minMinutes;
+  };
+
+  const isMinuteDisabled = (minute: number) => {
+    if (selectedHour === null || minMinutes === null) {
+      return false;
+    }
+
+    return selectedHour * 60 + minute < minMinutes;
+  };
 
   return (
-    <FormInput
-      type="text"
-      inputMode="numeric"
-      placeholder="HH:mm"
-      className="w-20"
-      value={draftValue}
-      onChange={(event) => {
-        const nextDraftValue = normalizeTimeDraft(event.target.value);
-        setDraftValue(nextDraftValue);
+    <div ref={pickerRef} className="relative w-34">
+      <button
+        type="button"
+        onClick={() => {
+          if (isOpen) {
+            closePicker();
+            return;
+          }
 
-        if (!nextDraftValue) {
-          onChange("");
-          return;
-        }
+          setStep("HOUR");
+          setSelectedHour(null);
+          setIsOpen(true);
+        }}
+        className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 text-left transition outline-none focus:ring-2"
+      >
+        {value || "HH:mm"}
+        <span className="text-fg-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[11px]">
+          v
+        </span>
+      </button>
+      {isOpen ? (
+        <div className="border-border-control bg-bg-app absolute top-12 left-0 z-40 w-60 rounded-lg border p-2 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-fg-subtle text-[12px] font-medium">
+              {step === "HOUR" ? "Hour" : "Minute"}
+            </span>
+            {step === "MINUTE" ? (
+              <button
+                type="button"
+                onClick={() => setStep("HOUR")}
+                className="text-fg-muted hover:text-fg-secondary text-[12px]"
+              >
+                Back
+              </button>
+            ) : null}
+          </div>
 
-        const completeTime = parseComplete24HourTime(nextDraftValue);
-        if (completeTime) {
-          onChange(completeTime);
-        }
-      }}
-      onBlur={() => {
-        const nextValue = toClamped24HourTime(draftValue);
-        setDraftValue(nextValue);
-        onChange(nextValue);
-      }}
-    />
+          {step === "HOUR" ? (
+            <div className="grid grid-cols-4 gap-1 overflow-y-auto pr-1">
+              {HOUR_OPTIONS.map((hour) => {
+                const isDisabled = isHourDisabled(hour);
+
+                return (
+                  <button
+                    key={hour}
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => {
+                      setSelectedHour(hour);
+                      setStep("MINUTE");
+                    }}
+                    className={`h-8 rounded-md text-[13px] transition ${
+                      isDisabled
+                        ? "text-fg-muted/45 cursor-not-allowed"
+                        : "text-fg-subtle hover:bg-bg-control"
+                    }`.trim()}
+                  >
+                    {padTwoDigits(hour)}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid max-h-53 grid-cols-4 gap-1 overflow-y-auto pr-1">
+              {MINUTE_OPTIONS.map((minute) => {
+                const minuteLabel = padTwoDigits(minute);
+                const isDisabled = isMinuteDisabled(minute);
+                const nextValue =
+                  selectedHour === null
+                    ? ""
+                    : `${padTwoDigits(selectedHour)}:${minuteLabel}`;
+
+                return (
+                  <button
+                    key={minute}
+                    type="button"
+                    disabled={isDisabled || selectedHour === null}
+                    onClick={() => {
+                      if (!nextValue) {
+                        return;
+                      }
+
+                      onChange(nextValue);
+                      closePicker();
+                    }}
+                    className={`h-8 rounded-md text-[13px] transition ${
+                      isDisabled || selectedHour === null
+                        ? "text-fg-muted/45 cursor-not-allowed"
+                        : nextValue === value
+                          ? "bg-focus-ring text-fg-primary"
+                          : "text-fg-subtle hover:bg-bg-control"
+                    }`.trim()}
+                  >
+                    {minuteLabel}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                onChange("");
+                closePicker();
+              }}
+              className="text-fg-muted hover:text-fg-secondary text-[12px]"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -512,21 +593,32 @@ function BaseInfoEventDateField({
               startTime: "",
               endTime: "",
             };
+            const currentEndTimeMinutes = toMinutes(currentTime.endTime);
 
             return (
               <div key={date} className="flex items-center gap-2">
                 <span className="text-fg-subtle w-18 text-[15px] font-medium">
                   {formatIsoDateCompact(date)}
                 </span>
-                <TimeInputField
+                <TimePickerField
                   value={currentTime.startTime}
-                  onChange={(nextValue) =>
-                    onPeriodTimeChange(date, "startTime", nextValue)
-                  }
+                  onChange={(nextValue) => {
+                    onPeriodTimeChange(date, "startTime", nextValue);
+
+                    const nextStartTimeMinutes = toMinutes(nextValue);
+                    if (
+                      nextStartTimeMinutes !== null &&
+                      currentEndTimeMinutes !== null &&
+                      currentEndTimeMinutes < nextStartTimeMinutes
+                    ) {
+                      onPeriodTimeChange(date, "endTime", "");
+                    }
+                  }}
                 />
                 <span className="text-fg-subtle text-[15px]">~</span>
-                <TimeInputField
+                <TimePickerField
                   value={currentTime.endTime}
+                  minTime={currentTime.startTime}
                   onChange={(nextValue) =>
                     onPeriodTimeChange(date, "endTime", nextValue)
                   }
