@@ -13,7 +13,9 @@ import type {
   TruckType,
 } from "../../types";
 import {
+  formatIsoDate,
   getIsoDateRange,
+  parseIsoDate,
   getRegionSiOptions,
   INITIAL_EVENT_FORM_BASE_INFO,
   INITIAL_EVENT_FORM_DETAIL,
@@ -73,6 +75,9 @@ const EVENT_CATEGORY_CODE_MAP: Record<string, string> = {
 
 const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
 
+const RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE =
+  "모집마감일은 행사일시 종료일 이전으로 입력해 주세요.";
+
 export type EventDetailData = NonNullable<EventDetailResponse["data"]>;
 
 export type EventFormStateBundle = {
@@ -126,6 +131,26 @@ function toIsoDateTime(value: string) {
   }
 
   return parsed.toISOString();
+}
+
+function getStartOfIsoDate(value: string) {
+  const parsed = parseIsoDate(value);
+  if (!parsed) {
+    return null;
+  }
+
+  parsed.setHours(0, 0, 0, 0);
+  return parsed;
+}
+
+function getPreviousIsoDate(value: string) {
+  const parsed = parseIsoDate(value);
+  if (!parsed) {
+    return "";
+  }
+
+  parsed.setDate(parsed.getDate() - 1);
+  return formatIsoDate(parsed);
 }
 
 function toDateTimeLocalValue(value: string) {
@@ -340,6 +365,65 @@ export function buildEventDateDtoList(baseInfoForm: BaseInfoFormState): EventDat
   });
 }
 
+export function getEventEndDate(baseInfoForm: BaseInfoFormState) {
+  if (baseInfoForm.eventDateMode === "PERIOD") {
+    return baseInfoForm.periodEndDate;
+  }
+
+  if (baseInfoForm.selectedDates.length === 0) {
+    return "";
+  }
+
+  return baseInfoForm.selectedDates.reduce((latest, current) =>
+    current > latest ? current : latest,
+  );
+}
+
+export function isRecruitEndDateWithinEventEndDate(
+  recruitEndDateTime: string,
+  eventEndDate: string,
+) {
+  if (!eventEndDate) {
+    return true;
+  }
+
+  const recruitEndDate = new Date(recruitEndDateTime);
+  const eventEndDateStart = getStartOfIsoDate(eventEndDate);
+
+  if (Number.isNaN(recruitEndDate.getTime()) || !eventEndDateStart) {
+    return false;
+  }
+
+  return recruitEndDate < eventEndDateStart;
+}
+
+export function clampRecruitEndDateTimeToEventEndDate(
+  recruitEndDateTime: string,
+  eventEndDate: string,
+) {
+  if (!recruitEndDateTime || !eventEndDate) {
+    return recruitEndDateTime;
+  }
+
+  if (isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDate)) {
+    return recruitEndDateTime;
+  }
+
+  const recruitEndDate = new Date(recruitEndDateTime);
+  if (Number.isNaN(recruitEndDate.getTime())) {
+    return recruitEndDateTime;
+  }
+
+  const previousEventDate = getPreviousIsoDate(eventEndDate);
+  if (!previousEventDate) {
+    return recruitEndDateTime;
+  }
+
+  const hours = String(recruitEndDate.getHours()).padStart(2, "0");
+  const minutes = String(recruitEndDate.getMinutes()).padStart(2, "0");
+  return `${previousEventDate}T${hours}:${minutes}`;
+}
+
 export function buildCreateEventRequestBody({
   baseInfoForm,
   eventRecruitForm,
@@ -435,6 +519,16 @@ export function buildCreateEventRequestBody({
   const recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
   if (!recruitEndDateTimeIso) {
     return fail();
+  }
+
+  const eventEndDate = getEventEndDate(baseInfoForm);
+  if (
+    !isRecruitEndDateWithinEventEndDate(
+      eventRecruitForm.recruitEndDateTime,
+      eventEndDate,
+    )
+  ) {
+    return fail(RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE);
   }
 
   const trimmedCateringDetail = eventTargetForm.cateringDetail.trim();
