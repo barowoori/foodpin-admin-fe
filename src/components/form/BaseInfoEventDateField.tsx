@@ -32,6 +32,137 @@ type CalendarMode = "MULTI" | "RANGE";
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 
+function padTwoDigits(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function normalizeTimeDraft(rawValue: string) {
+  const sanitized = rawValue.replace(/[^\d:]/g, "");
+
+  if (sanitized.includes(":")) {
+    const [hourPart = "", minutePart = ""] = sanitized.split(":");
+    return `${hourPart.slice(0, 2)}:${minutePart.slice(0, 2)}`;
+  }
+
+  const digits = sanitized.replace(/\D/g, "").slice(0, 4);
+
+  if (digits.length <= 2) {
+    return digits;
+  }
+
+  if (digits.length === 3) {
+    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  }
+
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+
+function parseComplete24HourTime(value: string) {
+  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+
+  if (
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes) ||
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return null;
+  }
+
+  return `${padTwoDigits(hours)}:${padTwoDigits(minutes)}`;
+}
+
+function toClamped24HourTime(value: string) {
+  if (!value.trim()) {
+    return "";
+  }
+
+  const normalized = normalizeTimeDraft(value);
+  const completeTime = parseComplete24HourTime(normalized);
+  if (completeTime) {
+    return completeTime;
+  }
+
+  const digits = normalized.replace(/\D/g, "").slice(0, 4);
+  if (!digits) {
+    return "";
+  }
+
+  let hours: number;
+  let minutes: number;
+
+  if (digits.length <= 2) {
+    hours = Number(digits);
+    minutes = 0;
+  } else if (digits.length === 3) {
+    hours = Number(digits.slice(0, 2));
+    minutes = Number(digits.slice(2)) * 10;
+  } else {
+    hours = Number(digits.slice(0, 2));
+    minutes = Number(digits.slice(2));
+  }
+
+  const clampedHours = Math.min(
+    23,
+    Math.max(0, Number.isNaN(hours) ? 0 : hours),
+  );
+  const clampedMinutes = Math.min(
+    59,
+    Math.max(0, Number.isNaN(minutes) ? 0 : minutes),
+  );
+  return `${padTwoDigits(clampedHours)}:${padTwoDigits(clampedMinutes)}`;
+}
+
+type TimeInputFieldProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+function TimeInputField({ value, onChange }: TimeInputFieldProps) {
+  const [draftValue, setDraftValue] = useState(value);
+
+  useEffect(() => {
+    setDraftValue(value);
+  }, [value]);
+
+  return (
+    <FormInput
+      type="text"
+      inputMode="numeric"
+      placeholder="HH:mm"
+      className="w-20"
+      value={draftValue}
+      onChange={(event) => {
+        const nextDraftValue = normalizeTimeDraft(event.target.value);
+        setDraftValue(nextDraftValue);
+
+        if (!nextDraftValue) {
+          onChange("");
+          return;
+        }
+
+        const completeTime = parseComplete24HourTime(nextDraftValue);
+        if (completeTime) {
+          onChange(completeTime);
+        }
+      }}
+      onBlur={() => {
+        const nextValue = toClamped24HourTime(draftValue);
+        setDraftValue(nextValue);
+        onChange(nextValue);
+      }}
+    />
+  );
+}
+
 function getInitialMonth(anchorDate: string) {
   const parsed = parseIsoDate(anchorDate);
   if (parsed) {
@@ -387,22 +518,18 @@ function BaseInfoEventDateField({
                 <span className="text-fg-subtle w-18 text-[15px] font-medium">
                   {formatIsoDateCompact(date)}
                 </span>
-                <FormInput
-                  type="time"
+                <TimeInputField
                   value={currentTime.startTime}
-                  onChange={(event) =>
-                    onPeriodTimeChange(date, "startTime", event.target.value)
+                  onChange={(nextValue) =>
+                    onPeriodTimeChange(date, "startTime", nextValue)
                   }
-                  className="w-28"
                 />
                 <span className="text-fg-subtle text-[15px]">~</span>
-                <FormInput
-                  type="time"
+                <TimeInputField
                   value={currentTime.endTime}
-                  onChange={(event) =>
-                    onPeriodTimeChange(date, "endTime", event.target.value)
+                  onChange={(nextValue) =>
+                    onPeriodTimeChange(date, "endTime", nextValue)
                   }
-                  className="w-28"
                 />
                 {index === 0 ? (
                   <label className="text-fg-subtle inline-flex items-center gap-1.5 text-[15px]">

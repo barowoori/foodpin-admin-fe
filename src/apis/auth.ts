@@ -20,7 +20,6 @@ interface LoginRequestBody {
     id: string;
   };
   identityToken: string;
-  authorizationCode: string;
 }
 
 interface LoginTokens {
@@ -120,10 +119,12 @@ export async function loginWithKakaoCode(code: string): Promise<LoginTokens> {
       id: kakaoUserId,
     },
     identityToken: kakaoAccessToken,
-    authorizationCode: "",
   };
 
-  const res = await api.post<LoginResponse>("/members/v2/login", requestBody);
+  const res = await api.post<LoginResponse>(
+    "/members/v2/login/backoffice",
+    requestBody,
+  );
   const { accessToken, refreshToken } = res.data.data;
 
   if (!accessToken || !refreshToken) {

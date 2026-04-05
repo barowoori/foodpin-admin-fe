@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../components";
 import {
@@ -15,6 +15,10 @@ import { useEventFormState } from "../features/eventForm/useEventFormState";
 import { useEventFormSubmit } from "../features/eventForm/useEventFormSubmit";
 import { useEventSectionUpdate } from "../features/eventForm/useEventSectionUpdate";
 import { isCreateEventTextLengthValid } from "../features/eventForm/textLengthValidation";
+import {
+  clampRecruitEndDateTimeToEventEndDate,
+  getEventEndDate,
+} from "../features/eventForm/formModel";
 
 type EventSection = "info" | "recruit" | "target" | "detail" | "url";
 const PAGE_SECONDARY_BUTTON_CLASS =
@@ -72,6 +76,22 @@ function EventFormPage() {
     ],
   );
   const isCreateSubmitDisabled = isPending || !isCreateTextLengthValid;
+  const eventEndDate = useMemo(() => getEventEndDate(baseInfoForm), [baseInfoForm]);
+
+  useEffect(() => {
+    if (!eventRecruitForm.recruitEndDateTime || !eventEndDate) {
+      return;
+    }
+
+    const clampedRecruitEndDateTime = clampRecruitEndDateTimeToEventEndDate(
+      eventRecruitForm.recruitEndDateTime,
+      eventEndDate,
+    );
+
+    if (clampedRecruitEndDateTime !== eventRecruitForm.recruitEndDateTime) {
+      handleRecruitInfoChange({ recruitEndDateTime: clampedRecruitEndDateTime });
+    }
+  }, [eventEndDate, eventRecruitForm.recruitEndDateTime, handleRecruitInfoChange]);
 
   const handleDeleteConfirm = async () => {
     const isDeleted = await handleDelete();
@@ -217,6 +237,7 @@ function EventFormPage() {
             <EventRecruitInfo
               value={eventRecruitForm}
               onChange={handleRecruitInfoChange}
+              maxRecruitEndDate={eventEndDate}
             />
             {renderSectionEditButton("recruit")}
           </section>

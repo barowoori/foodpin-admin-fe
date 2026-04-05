@@ -2,12 +2,14 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./EventRecruitInfo.css";
 import type { EventRecruitFormState } from "../../types";
+import { parseIsoDate } from "../../utils";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
 
 type EventRecruitInfoProps = {
   value: EventRecruitFormState;
   onChange: (patch: Partial<EventRecruitFormState>) => void;
+  maxRecruitEndDate?: string;
 };
 
 function toPickerDate(value: string) {
@@ -32,7 +34,43 @@ function toFormDateTimeValue(value: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-function EventRecruitInfo({ value, onChange }: EventRecruitInfoProps) {
+function getMaxRecruitDateBeforeEventEnd(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = parseIsoDate(value);
+  if (!parsed) {
+    return undefined;
+  }
+
+  parsed.setDate(parsed.getDate() - 1);
+  parsed.setHours(23, 59, 59, 999);
+  return parsed;
+}
+
+function getStartOfIsoDate(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = parseIsoDate(value);
+  if (!parsed) {
+    return undefined;
+  }
+
+  parsed.setHours(0, 0, 0, 0);
+  return parsed;
+}
+
+function EventRecruitInfo({
+  value,
+  onChange,
+  maxRecruitEndDate,
+}: EventRecruitInfoProps) {
+  const maxRecruitDate = getMaxRecruitDateBeforeEventEnd(maxRecruitEndDate);
+  const eventEndDateStart = getStartOfIsoDate(maxRecruitEndDate);
+
   return (
     <FormBox className="overflow-visible">
       <FormBox.Row label="모집마감일" required>
@@ -49,6 +87,10 @@ function EventRecruitInfo({ value, onChange }: EventRecruitInfoProps) {
             timeIntervals={10}
             timeFormat="HH:mm"
             dateFormat="yyyy-MM-dd HH:mm"
+            maxDate={maxRecruitDate}
+            filterDate={(date) =>
+              eventEndDateStart ? date < eventEndDateStart : true
+            }
             placeholderText="YYYY-MM-DD HH:mm"
             className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 transition outline-none focus:ring-2"
             wrapperClassName="event-recruit-datepicker-wrapper"

@@ -18,7 +18,12 @@ import type {
   EventRecruitFormState,
   EventTargetFormState,
 } from "../../types";
-import { buildEventDateDtoList, normalizeEventCategoryCodes } from "./formModel";
+import {
+  buildEventDateDtoList,
+  getEventEndDate,
+  isRecruitEndDateWithinEventEndDate,
+  normalizeEventCategoryCodes,
+} from "./formModel";
 import {
   getMaxPhotoCountMessage,
   MAX_EVENT_PHOTO_COUNT,
@@ -221,6 +226,17 @@ export function useEventSectionUpdate({
       return;
     }
 
+    const eventEndDate = getEventEndDate(baseInfoForm);
+    if (
+      !isRecruitEndDateWithinEventEndDate(
+        eventRecruitForm.recruitEndDateTime,
+        eventEndDate,
+      )
+    ) {
+      alert("모집마감일은 행사일시 종료일 이전으로 입력해 주세요.");
+      return;
+    }
+
     const payload: UpdateEventRecruitPayload = {
       recruitEndDateTime: recruitEndDateTimeIso,
       recruitCount: Math.max(0, eventRecruitForm.recruitCount),
@@ -235,7 +251,7 @@ export function useEventSectionUpdate({
       console.error("Failed to update event recruit", error);
       alert("모집정보 수정에 실패했습니다.");
     }
-  }, [eventId, eventRecruitForm, recruitMutation]);
+  }, [baseInfoForm, eventId, eventRecruitForm, recruitMutation]);
 
   const handleTargetUpdate = useCallback(async () => {
     if (!eventId) {
