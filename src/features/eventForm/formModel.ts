@@ -13,7 +13,6 @@ import type {
   TruckType,
 } from "../../types";
 import {
-  formatIsoDate,
   getIsoDateRange,
   parseIsoDate,
   getRegionSiOptions,
@@ -131,26 +130,6 @@ function toIsoDateTime(value: string) {
   }
 
   return parsed.toISOString();
-}
-
-function getStartOfIsoDate(value: string) {
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
-    return null;
-  }
-
-  parsed.setHours(0, 0, 0, 0);
-  return parsed;
-}
-
-function getPreviousIsoDate(value: string) {
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
-    return "";
-  }
-
-  parsed.setDate(parsed.getDate() - 1);
-  return formatIsoDate(parsed);
 }
 
 function toDateTimeLocalValue(value: string) {
@@ -379,33 +358,44 @@ export function getEventEndDate(baseInfoForm: BaseInfoFormState) {
   );
 }
 
+export function getEventEndDateTime(baseInfoForm: BaseInfoFormState) {
+  const eventEndDate = getEventEndDate(baseInfoForm);
+  if (!eventEndDate) {
+    return "";
+  }
+
+  const endTime = baseInfoForm.periodTimeByDate[eventEndDate]?.endTime || "23:59";
+  const normalizedTime = endTime.length >= 5 ? endTime.slice(0, 5) : "23:59";
+  return `${eventEndDate}T${normalizedTime}`;
+}
+
 export function isRecruitEndDateWithinEventEndDate(
   recruitEndDateTime: string,
-  eventEndDate: string,
+  eventEndDateTime: string,
 ) {
-  if (!eventEndDate) {
+  if (!eventEndDateTime) {
     return true;
   }
 
   const recruitEndDate = new Date(recruitEndDateTime);
-  const eventEndDateStart = getStartOfIsoDate(eventEndDate);
+  const eventEndDate = new Date(eventEndDateTime);
 
-  if (Number.isNaN(recruitEndDate.getTime()) || !eventEndDateStart) {
+  if (Number.isNaN(recruitEndDate.getTime()) || Number.isNaN(eventEndDate.getTime())) {
     return false;
   }
 
-  return recruitEndDate < eventEndDateStart;
+  return recruitEndDate <= eventEndDate;
 }
 
 export function clampRecruitEndDateTimeToEventEndDate(
   recruitEndDateTime: string,
-  eventEndDate: string,
+  eventEndDateTime: string,
 ) {
-  if (!recruitEndDateTime || !eventEndDate) {
+  if (!recruitEndDateTime || !eventEndDateTime) {
     return recruitEndDateTime;
   }
 
-  if (isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDate)) {
+  if (isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDateTime)) {
     return recruitEndDateTime;
   }
 
@@ -414,14 +404,17 @@ export function clampRecruitEndDateTimeToEventEndDate(
     return recruitEndDateTime;
   }
 
-  const previousEventDate = getPreviousIsoDate(eventEndDate);
-  if (!previousEventDate) {
+  const eventEndDate = new Date(eventEndDateTime);
+  if (Number.isNaN(eventEndDate.getTime())) {
     return recruitEndDateTime;
   }
 
-  const hours = String(recruitEndDate.getHours()).padStart(2, "0");
-  const minutes = String(recruitEndDate.getMinutes()).padStart(2, "0");
-  return `${previousEventDate}T${hours}:${minutes}`;
+  const year = eventEndDate.getFullYear();
+  const month = String(eventEndDate.getMonth() + 1).padStart(2, "0");
+  const day = String(eventEndDate.getDate()).padStart(2, "0");
+  const hours = String(eventEndDate.getHours()).padStart(2, "0");
+  const minutes = String(eventEndDate.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 export function buildCreateEventRequestBody({
@@ -521,7 +514,7 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
-  const eventEndDate = getEventEndDate(baseInfoForm);
+  const eventEndDate = getEventEndDateTime(baseInfoForm);
   if (
     !isRecruitEndDateWithinEventEndDate(
       eventRecruitForm.recruitEndDateTime,

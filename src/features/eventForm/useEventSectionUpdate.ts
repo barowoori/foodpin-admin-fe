@@ -20,7 +20,7 @@ import type {
 } from "../../types";
 import {
   buildEventDateDtoList,
-  getEventEndDate,
+  getEventEndDateTime,
   isRecruitEndDateWithinEventEndDate,
   normalizeEventCategoryCodes,
 } from "./formModel";
@@ -226,7 +226,7 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const eventEndDate = getEventEndDate(baseInfoForm);
+    const eventEndDate = getEventEndDateTime(baseInfoForm);
     if (
       !isRecruitEndDateWithinEventEndDate(
         eventRecruitForm.recruitEndDateTime,
