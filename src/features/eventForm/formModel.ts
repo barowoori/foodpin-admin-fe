@@ -13,9 +13,7 @@ import type {
   TruckType,
 } from "../../types";
 import {
-  formatIsoDate,
   getIsoDateRange,
-  parseIsoDate,
   getRegionSiOptions,
   INITIAL_EVENT_FORM_BASE_INFO,
   INITIAL_EVENT_FORM_DETAIL,
@@ -133,26 +131,6 @@ function toIsoDateTime(value: string) {
   return parsed.toISOString();
 }
 
-function getStartOfIsoDate(value: string) {
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
-    return null;
-  }
-
-  parsed.setHours(0, 0, 0, 0);
-  return parsed;
-}
-
-function getPreviousIsoDate(value: string) {
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
-    return "";
-  }
-
-  parsed.setDate(parsed.getDate() - 1);
-  return formatIsoDate(parsed);
-}
-
 function toDateTimeLocalValue(value: string) {
   if (!value) {
     return "";
@@ -184,7 +162,10 @@ function toTimeInputValue(value: string) {
   return "";
 }
 
-function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {
+function isOneOf<T extends string>(
+  value: unknown,
+  allowed: readonly T[],
+): value is T {
   return typeof value === "string" && allowed.includes(value as T);
 }
 
@@ -221,7 +202,8 @@ function isContinuousDates(dates: string[]) {
   for (let i = 1; i < dates.length; i += 1) {
     const prev = new Date(`${dates[i - 1]}T00:00:00`);
     const current = new Date(`${dates[i]}T00:00:00`);
-    const diffDays = (current.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000);
+    const diffDays =
+      (current.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000);
 
     if (diffDays !== 1) {
       return false;
@@ -233,16 +215,19 @@ function isContinuousDates(dates: string[]) {
 
 function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
   const regionCode =
-    detail.regions?.find((region) => typeof region?.code === "string")?.code ?? "";
+    detail.regions?.find((region) => typeof region?.code === "string")?.code ??
+    "";
   const { regionDo, regionSi } = resolveRegionSelection(regionCode);
 
   const dateEntries = Array.isArray(detail.dates)
-    ? detail.dates.filter((entry): entry is NonNullable<typeof entry> => Boolean(entry?.date))
+    ? detail.dates.filter((entry): entry is NonNullable<typeof entry> =>
+        Boolean(entry?.date),
+      )
     : [];
 
-  const sortedDates = [...new Set(dateEntries.map((entry) => entry.date as string))].sort(
-    (a, b) => (a < b ? -1 : a > b ? 1 : 0),
-  );
+  const sortedDates = [
+    ...new Set(dateEntries.map((entry) => entry.date as string)),
+  ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
   const periodTimeByDate: Record<string, EventDateTime> = {};
   dateEntries.forEach((entry) => {
@@ -263,7 +248,8 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     name: detail.name ?? "",
     type: isOneOf(detail.type, EVENT_TYPES) ? detail.type : "",
     expectedParticipants:
-      detail.expectedParticipants ?? INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
+      detail.expectedParticipants ??
+      INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
     fileIdList:
       detail.photos
         ?.map((photo) => photo?.id)
@@ -278,8 +264,10 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     recruitmentUrl: detail.recruitmentUrl ?? "",
     eventDateMode: usePeriodMode ? "PERIOD" : "DATE",
     selectedDates: usePeriodMode ? [] : sortedDates,
-    periodStartDate: usePeriodMode ? sortedDates[0] ?? "" : "",
-    periodEndDate: usePeriodMode ? sortedDates[sortedDates.length - 1] ?? "" : "",
+    periodStartDate: usePeriodMode ? (sortedDates[0] ?? "") : "",
+    periodEndDate: usePeriodMode
+      ? (sortedDates[sortedDates.length - 1] ?? "")
+      : "",
     applyTimeToAll: false,
     periodTimeByDate,
   };
@@ -291,12 +279,16 @@ function mapDetailToRecruit(detail: EventDetailData): EventRecruitFormState {
     recruitCount: Math.max(0, detail.recruitInfo?.recruitCount ?? 0),
     isFullAttendanceRequired: detail.isFullAttendanceRequired ?? true,
     isRecruitEndOnSelection:
-      detail.isRecruitEndOnSelection ?? detail.recruitInfo?.isRecruitEndOnSelection ?? true,
+      detail.isRecruitEndOnSelection ??
+      detail.recruitInfo?.isRecruitEndOnSelection ??
+      true,
   };
 }
 
 function mapDetailToTarget(detail: EventDetailData): EventTargetFormState {
-  const saleType = isOneOf(detail.saleType, SALE_TYPES) ? detail.saleType : "NORMAL";
+  const saleType = isOneOf(detail.saleType, SALE_TYPES)
+    ? detail.saleType
+    : "NORMAL";
   const rawCategoryCodes =
     detail.categories
       ?.map((category) => category?.code)
@@ -330,7 +322,9 @@ function mapDetailToDetailForm(detail: EventDetailData): EventDetailFormState {
   };
 }
 
-export function mapDetailToEventFormState(detail: EventDetailData): EventFormStateBundle {
+export function mapDetailToEventFormState(
+  detail: EventDetailData,
+): EventFormStateBundle {
   return {
     baseInfoForm: mapDetailToBaseInfo(detail),
     eventRecruitForm: mapDetailToRecruit(detail),
@@ -339,9 +333,14 @@ export function mapDetailToEventFormState(detail: EventDetailData): EventFormSta
   };
 }
 
-export function buildEventDateDtoList(baseInfoForm: BaseInfoFormState): EventDateRequestDto[] {
+export function buildEventDateDtoList(
+  baseInfoForm: BaseInfoFormState,
+): EventDateRequestDto[] {
   if (baseInfoForm.eventDateMode === "PERIOD") {
-    const dates = getIsoDateRange(baseInfoForm.periodStartDate, baseInfoForm.periodEndDate);
+    const dates = getIsoDateRange(
+      baseInfoForm.periodStartDate,
+      baseInfoForm.periodEndDate,
+    );
 
     return dates.map((date) => {
       const time = baseInfoForm.periodTimeByDate[date];
@@ -379,33 +378,50 @@ export function getEventEndDate(baseInfoForm: BaseInfoFormState) {
   );
 }
 
+export function getEventEndDateTime(baseInfoForm: BaseInfoFormState) {
+  const eventEndDate = getEventEndDate(baseInfoForm);
+  if (!eventEndDate) {
+    return "";
+  }
+
+  const endTime =
+    baseInfoForm.periodTimeByDate[eventEndDate]?.endTime || "23:59";
+  const normalizedTime = endTime.length >= 5 ? endTime.slice(0, 5) : "23:59";
+  return `${eventEndDate}T${normalizedTime}`;
+}
+
 export function isRecruitEndDateWithinEventEndDate(
   recruitEndDateTime: string,
-  eventEndDate: string,
+  eventEndDateTime: string,
 ) {
-  if (!eventEndDate) {
+  if (!eventEndDateTime) {
     return true;
   }
 
   const recruitEndDate = new Date(recruitEndDateTime);
-  const eventEndDateStart = getStartOfIsoDate(eventEndDate);
+  const eventEndDate = new Date(eventEndDateTime);
 
-  if (Number.isNaN(recruitEndDate.getTime()) || !eventEndDateStart) {
+  if (
+    Number.isNaN(recruitEndDate.getTime()) ||
+    Number.isNaN(eventEndDate.getTime())
+  ) {
     return false;
   }
 
-  return recruitEndDate < eventEndDateStart;
+  return recruitEndDate <= eventEndDate;
 }
 
 export function clampRecruitEndDateTimeToEventEndDate(
   recruitEndDateTime: string,
-  eventEndDate: string,
+  eventEndDateTime: string,
 ) {
-  if (!recruitEndDateTime || !eventEndDate) {
+  if (!recruitEndDateTime || !eventEndDateTime) {
     return recruitEndDateTime;
   }
 
-  if (isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDate)) {
+  if (
+    isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDateTime)
+  ) {
     return recruitEndDateTime;
   }
 
@@ -414,14 +430,17 @@ export function clampRecruitEndDateTimeToEventEndDate(
     return recruitEndDateTime;
   }
 
-  const previousEventDate = getPreviousIsoDate(eventEndDate);
-  if (!previousEventDate) {
+  const eventEndDate = new Date(eventEndDateTime);
+  if (Number.isNaN(eventEndDate.getTime())) {
     return recruitEndDateTime;
   }
 
-  const hours = String(recruitEndDate.getHours()).padStart(2, "0");
-  const minutes = String(recruitEndDate.getMinutes()).padStart(2, "0");
-  return `${previousEventDate}T${hours}:${minutes}`;
+  const year = eventEndDate.getFullYear();
+  const month = String(eventEndDate.getMonth() + 1).padStart(2, "0");
+  const day = String(eventEndDate.getDate()).padStart(2, "0");
+  const hours = String(eventEndDate.getHours()).padStart(2, "0");
+  const minutes = String(eventEndDate.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 export function buildCreateEventRequestBody({
@@ -430,7 +449,9 @@ export function buildCreateEventRequestBody({
   eventTargetForm,
   eventDetailForm,
 }: BuildCreateEventRequestBodyParams): BuildCreateEventRequestBodyResult {
-  const fail = (message = REQUIRED_VALIDATION_MESSAGE): BuildCreateEventRequestBodyResult => ({
+  const fail = (
+    message = REQUIRED_VALIDATION_MESSAGE,
+  ): BuildCreateEventRequestBodyResult => ({
     requestBody: null,
     errorMessage: message,
   });
@@ -443,7 +464,10 @@ export function buildCreateEventRequestBody({
     return fail(getMaxPhotoCountMessage());
   }
 
-  const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);
+  const nameLengthValidation = validateTextLength(
+    baseInfoForm.name,
+    EVENT_NAME_LIMIT,
+  );
   if (nameLengthValidation.isUnderMin) {
     return fail(getMinLengthMessage(EVENT_NAME_LIMIT.min));
   }
@@ -516,12 +540,14 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
-  const recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
+  const recruitEndDateTimeIso = toIsoDateTime(
+    eventRecruitForm.recruitEndDateTime,
+  );
   if (!recruitEndDateTimeIso) {
     return fail();
   }
 
-  const eventEndDate = getEventEndDate(baseInfoForm);
+  const eventEndDate = getEventEndDateTime(baseInfoForm);
   if (
     !isRecruitEndDateWithinEventEndDate(
       eventRecruitForm.recruitEndDateTime,
@@ -583,7 +609,8 @@ export function buildCreateEventRequestBody({
         description: eventDetailForm.description.trim(),
         guidelines: eventDetailForm.guidelines.trim(),
         contact: eventDetailForm.contact.trim(),
-        electricitySupportAvailability: eventDetailForm.electricitySupportAvailability,
+        electricitySupportAvailability:
+          eventDetailForm.electricitySupportAvailability,
         generatorRequirement: eventDetailForm.generatorRequirement,
       },
     },

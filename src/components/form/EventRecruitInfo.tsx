@@ -2,14 +2,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./EventRecruitInfo.css";
 import type { EventRecruitFormState } from "../../types";
-import { parseIsoDate } from "../../utils";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
 
 type EventRecruitInfoProps = {
   value: EventRecruitFormState;
   onChange: (patch: Partial<EventRecruitFormState>) => void;
-  maxRecruitEndDate?: string;
+  maxRecruitEndDateTime?: string;
 };
 
 function toPickerDate(value: string) {
@@ -34,42 +33,44 @@ function toFormDateTimeValue(value: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-function getMaxRecruitDateBeforeEventEnd(value?: string) {
+function toValidDate(value?: string) {
   if (!value) {
     return undefined;
   }
 
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
     return undefined;
   }
 
-  parsed.setDate(parsed.getDate() - 1);
-  parsed.setHours(23, 59, 59, 999);
   return parsed;
 }
 
-function getStartOfIsoDate(value?: string) {
+function getStartOfDate(value?: Date) {
   if (!value) {
     return undefined;
   }
 
-  const parsed = parseIsoDate(value);
-  if (!parsed) {
-    return undefined;
-  }
-
+  const parsed = new Date(value);
   parsed.setHours(0, 0, 0, 0);
   return parsed;
+}
+
+function isSameDate(left: Date, right: Date) {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
 }
 
 function EventRecruitInfo({
   value,
   onChange,
-  maxRecruitEndDate,
+  maxRecruitEndDateTime,
 }: EventRecruitInfoProps) {
-  const maxRecruitDate = getMaxRecruitDateBeforeEventEnd(maxRecruitEndDate);
-  const eventEndDateStart = getStartOfIsoDate(maxRecruitEndDate);
+  const maxRecruitDateTime = toValidDate(maxRecruitEndDateTime);
+  const eventEndDateStart = getStartOfDate(maxRecruitDateTime);
 
   return (
     <FormBox className="overflow-visible">
@@ -87,10 +88,21 @@ function EventRecruitInfo({
             timeIntervals={10}
             timeFormat="HH:mm"
             dateFormat="yyyy-MM-dd HH:mm"
-            maxDate={maxRecruitDate}
+            maxDate={maxRecruitDateTime}
             filterDate={(date) =>
-              eventEndDateStart ? date < eventEndDateStart : true
+              eventEndDateStart ? date <= eventEndDateStart : true
             }
+            filterTime={(time) => {
+              if (!maxRecruitDateTime) {
+                return true;
+              }
+
+              if (!isSameDate(time, maxRecruitDateTime)) {
+                return true;
+              }
+
+              return time <= maxRecruitDateTime;
+            }}
             placeholderText="YYYY-MM-DD HH:mm"
             className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 transition outline-none focus:ring-2"
             wrapperClassName="event-recruit-datepicker-wrapper"
@@ -137,7 +149,6 @@ function EventRecruitInfo({
           </label>
         </div>
       </FormBox.Row>
-
     </FormBox>
   );
 }

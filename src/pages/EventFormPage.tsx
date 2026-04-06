@@ -17,7 +17,7 @@ import { useEventSectionUpdate } from "../features/eventForm/useEventSectionUpda
 import { isCreateEventTextLengthValid } from "../features/eventForm/textLengthValidation";
 import {
   clampRecruitEndDateTimeToEventEndDate,
-  getEventEndDate,
+  getEventEndDateTime,
 } from "../features/eventForm/formModel";
 
 type EventSection = "info" | "recruit" | "target" | "detail" | "url";
@@ -76,22 +76,29 @@ function EventFormPage() {
     ],
   );
   const isCreateSubmitDisabled = isPending || !isCreateTextLengthValid;
-  const eventEndDate = useMemo(() => getEventEndDate(baseInfoForm), [baseInfoForm]);
+  const eventEndDateTime = useMemo(
+    () => getEventEndDateTime(baseInfoForm),
+    [baseInfoForm],
+  );
 
   useEffect(() => {
-    if (!eventRecruitForm.recruitEndDateTime || !eventEndDate) {
+    if (!eventRecruitForm.recruitEndDateTime || !eventEndDateTime) {
       return;
     }
 
     const clampedRecruitEndDateTime = clampRecruitEndDateTimeToEventEndDate(
       eventRecruitForm.recruitEndDateTime,
-      eventEndDate,
+      eventEndDateTime,
     );
 
     if (clampedRecruitEndDateTime !== eventRecruitForm.recruitEndDateTime) {
       handleRecruitInfoChange({ recruitEndDateTime: clampedRecruitEndDateTime });
     }
-  }, [eventEndDate, eventRecruitForm.recruitEndDateTime, handleRecruitInfoChange]);
+  }, [
+    eventEndDateTime,
+    eventRecruitForm.recruitEndDateTime,
+    handleRecruitInfoChange,
+  ]);
 
   const handleDeleteConfirm = async () => {
     const isDeleted = await handleDelete();
@@ -237,7 +244,7 @@ function EventFormPage() {
             <EventRecruitInfo
               value={eventRecruitForm}
               onChange={handleRecruitInfoChange}
-              maxRecruitEndDate={eventEndDate}
+              maxRecruitEndDateTime={eventEndDateTime}
             />
             {renderSectionEditButton("recruit")}
           </section>
