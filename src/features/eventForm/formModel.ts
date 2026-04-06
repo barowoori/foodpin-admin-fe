@@ -14,7 +14,6 @@ import type {
 } from "../../types";
 import {
   getIsoDateRange,
-  parseIsoDate,
   getRegionSiOptions,
   INITIAL_EVENT_FORM_BASE_INFO,
   INITIAL_EVENT_FORM_DETAIL,
@@ -163,7 +162,10 @@ function toTimeInputValue(value: string) {
   return "";
 }
 
-function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {
+function isOneOf<T extends string>(
+  value: unknown,
+  allowed: readonly T[],
+): value is T {
   return typeof value === "string" && allowed.includes(value as T);
 }
 
@@ -200,7 +202,8 @@ function isContinuousDates(dates: string[]) {
   for (let i = 1; i < dates.length; i += 1) {
     const prev = new Date(`${dates[i - 1]}T00:00:00`);
     const current = new Date(`${dates[i]}T00:00:00`);
-    const diffDays = (current.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000);
+    const diffDays =
+      (current.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000);
 
     if (diffDays !== 1) {
       return false;
@@ -212,16 +215,19 @@ function isContinuousDates(dates: string[]) {
 
 function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
   const regionCode =
-    detail.regions?.find((region) => typeof region?.code === "string")?.code ?? "";
+    detail.regions?.find((region) => typeof region?.code === "string")?.code ??
+    "";
   const { regionDo, regionSi } = resolveRegionSelection(regionCode);
 
   const dateEntries = Array.isArray(detail.dates)
-    ? detail.dates.filter((entry): entry is NonNullable<typeof entry> => Boolean(entry?.date))
+    ? detail.dates.filter((entry): entry is NonNullable<typeof entry> =>
+        Boolean(entry?.date),
+      )
     : [];
 
-  const sortedDates = [...new Set(dateEntries.map((entry) => entry.date as string))].sort(
-    (a, b) => (a < b ? -1 : a > b ? 1 : 0),
-  );
+  const sortedDates = [
+    ...new Set(dateEntries.map((entry) => entry.date as string)),
+  ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
   const periodTimeByDate: Record<string, EventDateTime> = {};
   dateEntries.forEach((entry) => {
@@ -242,7 +248,8 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     name: detail.name ?? "",
     type: isOneOf(detail.type, EVENT_TYPES) ? detail.type : "",
     expectedParticipants:
-      detail.expectedParticipants ?? INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
+      detail.expectedParticipants ??
+      INITIAL_EVENT_FORM_BASE_INFO.expectedParticipants,
     fileIdList:
       detail.photos
         ?.map((photo) => photo?.id)
@@ -257,8 +264,10 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     recruitmentUrl: detail.recruitmentUrl ?? "",
     eventDateMode: usePeriodMode ? "PERIOD" : "DATE",
     selectedDates: usePeriodMode ? [] : sortedDates,
-    periodStartDate: usePeriodMode ? sortedDates[0] ?? "" : "",
-    periodEndDate: usePeriodMode ? sortedDates[sortedDates.length - 1] ?? "" : "",
+    periodStartDate: usePeriodMode ? (sortedDates[0] ?? "") : "",
+    periodEndDate: usePeriodMode
+      ? (sortedDates[sortedDates.length - 1] ?? "")
+      : "",
     applyTimeToAll: false,
     periodTimeByDate,
   };
@@ -270,12 +279,16 @@ function mapDetailToRecruit(detail: EventDetailData): EventRecruitFormState {
     recruitCount: Math.max(0, detail.recruitInfo?.recruitCount ?? 0),
     isFullAttendanceRequired: detail.isFullAttendanceRequired ?? true,
     isRecruitEndOnSelection:
-      detail.isRecruitEndOnSelection ?? detail.recruitInfo?.isRecruitEndOnSelection ?? true,
+      detail.isRecruitEndOnSelection ??
+      detail.recruitInfo?.isRecruitEndOnSelection ??
+      true,
   };
 }
 
 function mapDetailToTarget(detail: EventDetailData): EventTargetFormState {
-  const saleType = isOneOf(detail.saleType, SALE_TYPES) ? detail.saleType : "NORMAL";
+  const saleType = isOneOf(detail.saleType, SALE_TYPES)
+    ? detail.saleType
+    : "NORMAL";
   const rawCategoryCodes =
     detail.categories
       ?.map((category) => category?.code)
@@ -309,7 +322,9 @@ function mapDetailToDetailForm(detail: EventDetailData): EventDetailFormState {
   };
 }
 
-export function mapDetailToEventFormState(detail: EventDetailData): EventFormStateBundle {
+export function mapDetailToEventFormState(
+  detail: EventDetailData,
+): EventFormStateBundle {
   return {
     baseInfoForm: mapDetailToBaseInfo(detail),
     eventRecruitForm: mapDetailToRecruit(detail),
@@ -318,9 +333,14 @@ export function mapDetailToEventFormState(detail: EventDetailData): EventFormSta
   };
 }
 
-export function buildEventDateDtoList(baseInfoForm: BaseInfoFormState): EventDateRequestDto[] {
+export function buildEventDateDtoList(
+  baseInfoForm: BaseInfoFormState,
+): EventDateRequestDto[] {
   if (baseInfoForm.eventDateMode === "PERIOD") {
-    const dates = getIsoDateRange(baseInfoForm.periodStartDate, baseInfoForm.periodEndDate);
+    const dates = getIsoDateRange(
+      baseInfoForm.periodStartDate,
+      baseInfoForm.periodEndDate,
+    );
 
     return dates.map((date) => {
       const time = baseInfoForm.periodTimeByDate[date];
@@ -364,7 +384,8 @@ export function getEventEndDateTime(baseInfoForm: BaseInfoFormState) {
     return "";
   }
 
-  const endTime = baseInfoForm.periodTimeByDate[eventEndDate]?.endTime || "23:59";
+  const endTime =
+    baseInfoForm.periodTimeByDate[eventEndDate]?.endTime || "23:59";
   const normalizedTime = endTime.length >= 5 ? endTime.slice(0, 5) : "23:59";
   return `${eventEndDate}T${normalizedTime}`;
 }
@@ -380,7 +401,10 @@ export function isRecruitEndDateWithinEventEndDate(
   const recruitEndDate = new Date(recruitEndDateTime);
   const eventEndDate = new Date(eventEndDateTime);
 
-  if (Number.isNaN(recruitEndDate.getTime()) || Number.isNaN(eventEndDate.getTime())) {
+  if (
+    Number.isNaN(recruitEndDate.getTime()) ||
+    Number.isNaN(eventEndDate.getTime())
+  ) {
     return false;
   }
 
@@ -395,7 +419,9 @@ export function clampRecruitEndDateTimeToEventEndDate(
     return recruitEndDateTime;
   }
 
-  if (isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDateTime)) {
+  if (
+    isRecruitEndDateWithinEventEndDate(recruitEndDateTime, eventEndDateTime)
+  ) {
     return recruitEndDateTime;
   }
 
@@ -423,7 +449,9 @@ export function buildCreateEventRequestBody({
   eventTargetForm,
   eventDetailForm,
 }: BuildCreateEventRequestBodyParams): BuildCreateEventRequestBodyResult {
-  const fail = (message = REQUIRED_VALIDATION_MESSAGE): BuildCreateEventRequestBodyResult => ({
+  const fail = (
+    message = REQUIRED_VALIDATION_MESSAGE,
+  ): BuildCreateEventRequestBodyResult => ({
     requestBody: null,
     errorMessage: message,
   });
@@ -436,7 +464,10 @@ export function buildCreateEventRequestBody({
     return fail(getMaxPhotoCountMessage());
   }
 
-  const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);
+  const nameLengthValidation = validateTextLength(
+    baseInfoForm.name,
+    EVENT_NAME_LIMIT,
+  );
   if (nameLengthValidation.isUnderMin) {
     return fail(getMinLengthMessage(EVENT_NAME_LIMIT.min));
   }
@@ -509,7 +540,9 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
-  const recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
+  const recruitEndDateTimeIso = toIsoDateTime(
+    eventRecruitForm.recruitEndDateTime,
+  );
   if (!recruitEndDateTimeIso) {
     return fail();
   }
@@ -576,7 +609,8 @@ export function buildCreateEventRequestBody({
         description: eventDetailForm.description.trim(),
         guidelines: eventDetailForm.guidelines.trim(),
         contact: eventDetailForm.contact.trim(),
-        electricitySupportAvailability: eventDetailForm.electricitySupportAvailability,
+        electricitySupportAvailability:
+          eventDetailForm.electricitySupportAvailability,
         generatorRequirement: eventDetailForm.generatorRequirement,
       },
     },
