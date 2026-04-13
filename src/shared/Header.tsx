@@ -54,7 +54,10 @@ function Header() {
           </div>
         </div>
 
-        <div className="relative" onClick={() => setIsMenuOpen((prev) => !prev)}>
+        <div
+          className="relative"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+        >
           <button
             type="button"
             className="bg-bg-app/65 border-border-control flex cursor-pointer items-center gap-3 rounded-full border px-2.5 py-1.5"
@@ -71,12 +74,14 @@ function Header() {
               </div>
             )}
             <div className="flex flex-col pr-1">
-              <span className="text-ui-sm leading-tight font-semibold">{nickname}</span>
+              <span className="text-ui-sm leading-tight font-semibold">
+                {nickname}
+              </span>
             </div>
           </button>
 
           <div
-            className={`border-border-control bg-bg-control absolute top-12 right-0 min-w-28 rounded-lg border p-1 shadow-lg transition-all duration-200 ${
+            className={`border-border-control bg-bg-control absolute left-[50%] mt-1 min-w-28 -translate-x-1/2 rounded-lg border p-1 shadow-lg transition-all duration-200 ${
               isMenuOpen
                 ? "visible translate-y-0 opacity-100"
                 : "pointer-events-none invisible -translate-y-1 opacity-0"
