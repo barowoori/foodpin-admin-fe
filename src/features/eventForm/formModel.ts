@@ -587,7 +587,7 @@ export function buildCreateEventRequestBody({
         recruitEndDateTime: recruitEndDateTimeIso,
         recruitCount: Math.max(0, eventRecruitForm.recruitCount),
         isFullAttendanceRequired: eventRecruitForm.isFullAttendanceRequired,
-        isRecruitEndOnSelection: eventRecruitForm.isRecruitEndOnSelection,
+        isRecruitEndOnSelection: false,
       },
       eventTargetDto: {
         truckTypes: eventTargetForm.truckTypes,
