@@ -29,7 +29,7 @@ export const INITIAL_EVENT_FORM_RECRUIT: EventRecruitFormState = {
   recruitEndDateTime: "",
   recruitCount: 0,
   isFullAttendanceRequired: true,
-  isRecruitEndOnSelection: true,
+  isRecruitEndOnSelection: false,
 };
 
 export const INITIAL_EVENT_FORM_TARGET: EventTargetFormState = {
