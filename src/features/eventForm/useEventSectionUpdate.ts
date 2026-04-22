@@ -119,7 +119,10 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const nameLengthValidation = validateTextLength(baseInfoForm.name, EVENT_NAME_LIMIT);
+    const nameLengthValidation = validateTextLength(
+      baseInfoForm.name,
+      EVENT_NAME_LIMIT,
+    );
     if (nameLengthValidation.isUnderMin) {
       alert(getMinLengthMessage(EVENT_NAME_LIMIT.min));
       return;
@@ -173,7 +176,10 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const descriptionValidation = validateTextLength(description, DESCRIPTION_LIMIT);
+    const descriptionValidation = validateTextLength(
+      description,
+      DESCRIPTION_LIMIT,
+    );
     if (descriptionValidation.isUnderMin) {
       alert(getMinLengthMessage(DESCRIPTION_LIMIT.min));
       return;
@@ -183,7 +189,10 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const guidelinesValidation = validateTextLength(guidelines, GUIDELINES_LIMIT);
+    const guidelinesValidation = validateTextLength(
+      guidelines,
+      GUIDELINES_LIMIT,
+    );
     if (guidelinesValidation.isUnderMin) {
       alert(getMinLengthMessage(GUIDELINES_LIMIT.min));
       return;
@@ -197,7 +206,8 @@ export function useEventSectionUpdate({
       description: description.trim(),
       guidelines: guidelines.trim(),
       contact,
-      electricitySupportAvailability: eventDetailForm.electricitySupportAvailability,
+      electricitySupportAvailability:
+        eventDetailForm.electricitySupportAvailability,
       generatorRequirement: eventDetailForm.generatorRequirement,
     };
 
@@ -220,7 +230,9 @@ export function useEventSectionUpdate({
       return;
     }
 
-    const recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
+    const recruitEndDateTimeIso = toIsoDateTime(
+      eventRecruitForm.recruitEndDateTime,
+    );
     if (!recruitEndDateTimeIso) {
       alert(REQUIRED_VALIDATION_MESSAGE);
       return;
@@ -241,7 +253,7 @@ export function useEventSectionUpdate({
       recruitEndDateTime: recruitEndDateTimeIso,
       recruitCount: Math.max(0, eventRecruitForm.recruitCount),
       isFullAttendanceRequired: eventRecruitForm.isFullAttendanceRequired,
-      isRecruitEndOnSelection: eventRecruitForm.isRecruitEndOnSelection,
+      isRecruitEndOnSelection: false,
     };
 
     try {
