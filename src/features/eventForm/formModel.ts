@@ -278,10 +278,7 @@ function mapDetailToRecruit(detail: EventDetailData): EventRecruitFormState {
     recruitEndDateTime: toDateTimeLocalValue(detail.recruitEndDateTime ?? ""),
     recruitCount: Math.max(0, detail.recruitInfo?.recruitCount ?? 0),
     isFullAttendanceRequired: detail.isFullAttendanceRequired ?? true,
-    isRecruitEndOnSelection:
-      detail.isRecruitEndOnSelection ??
-      detail.recruitInfo?.isRecruitEndOnSelection ??
-      true,
+    isRecruitEndOnSelection: false,
   };
 }
 
