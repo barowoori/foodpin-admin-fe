@@ -74,7 +74,7 @@ function DateRangeField({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex w-full flex-col items-start gap-2 lg:w-auto lg:flex-row lg:items-center lg:gap-3">
       <label
         htmlFor={startId}
         className="font-pretendard tracking-brand text-fg-secondary text-[16px] font-medium"
@@ -82,8 +82,8 @@ function DateRangeField({
         {label}
       </label>
 
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex w-full flex-col items-start gap-2 lg:w-auto lg:flex-row lg:items-center">
+        <div className="flex w-full items-center gap-2 lg:w-auto">
           <InputWrapper.Input
             id={startId}
             type="text"
@@ -111,9 +111,11 @@ function DateRangeField({
           />
         </div>
 
-        <span className="font-pretendard text-ui-base text-fg-subtle">~</span>
+        <span className="font-pretendard text-ui-base text-fg-subtle lg:self-auto">
+          ~
+        </span>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 lg:w-auto">
           <InputWrapper.Input
             id={endId}
             type="text"

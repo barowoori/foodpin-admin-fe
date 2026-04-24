@@ -77,8 +77,7 @@ function EventRecruitInfo({
       <FormBox.Row
         label="모집마감일"
         required={!value.isRecruitEndOnSelection}
-        labelClassName="text-[19px] sm:text-[20px]"
-        contentClassName="items-start py-3 sm:py-4"
+        contentClassName="items-start"
       >
         <div className="flex w-full max-w-105 flex-col gap-3">
           <DatePicker
@@ -110,7 +109,7 @@ function EventRecruitInfo({
               return time <= maxRecruitDateTime;
             }}
             placeholderText="YYYY-MM-DD HH:mm"
-            className={`font-pretendard border-border-control bg-bg-control text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 text-[15px] font-medium transition outline-none focus:ring-2 sm:h-12 sm:text-base ${
+            className={`font-pretendard border-border-control bg-bg-control text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 text-sm font-medium transition outline-none focus:ring-2 sm:h-12 sm:text-[15px] ${
               value.isRecruitEndOnSelection
                 ? "cursor-not-allowed opacity-60"
                 : ""
@@ -120,12 +119,12 @@ function EventRecruitInfo({
             calendarClassName="event-recruit-datepicker-calendar"
             popperClassName="event-recruit-datepicker-popper"
           />
-          <div className="border-border-control/80 bg-bg-app/45 flex items-center justify-between rounded-lg border px-3 py-2.5">
+          <div className="border-border-control/80 bg-bg-app/45 flex items-center justify-between rounded-lg border px-3 py-2">
             <div className="flex flex-col gap-0.5">
-              <span className="text-fg-primary text-[15px] font-semibold">
+              <span className="text-fg-primary text-sm font-semibold">
                 선정 시 마감
               </span>
-              <span className="text-fg-muted text-[12px] leading-4">
+              <span className="text-fg-muted text-[11px] leading-4">
                 선정 완료 시 모집을 자동 종료합니다.
               </span>
             </div>
@@ -169,7 +168,6 @@ function EventRecruitInfo({
       <FormBox.Row
         label="모집규모"
         required
-        labelClassName="text-[19px] sm:text-[20px]"
       >
         <FormInput
           type="number"
@@ -178,17 +176,13 @@ function EventRecruitInfo({
           onChange={(event) =>
             onChange({ recruitCount: Number(event.target.value) || 0 })
           }
-          className="w-full max-w-55 text-[15px] font-medium sm:text-base"
+          className="w-full max-w-55 text-sm font-medium sm:text-[15px]"
         />
       </FormBox.Row>
 
-      <FormBox.Row
-        label="전체 일정 참여"
-        required
-        labelClassName="text-[19px] sm:text-[20px]"
-      >
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="border-border-control/80 bg-bg-app/45 text-fg-primary inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-[15px] font-medium sm:text-base">
+      <FormBox.Row label="전체 일정 참여" required>
+        <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+          <label className="border-border-control/80 bg-bg-app/45 text-fg-primary inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:text-[15px]">
             <input
               type="radio"
               name="isFullAttendanceRequired"
@@ -198,7 +192,7 @@ function EventRecruitInfo({
             />
             필수
           </label>
-          <label className="border-border-control/80 bg-bg-app/45 text-fg-primary inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-[15px] font-medium sm:text-base">
+          <label className="border-border-control/80 bg-bg-app/45 text-fg-primary inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:text-[15px]">
             <input
               type="radio"
               name="isFullAttendanceRequired"

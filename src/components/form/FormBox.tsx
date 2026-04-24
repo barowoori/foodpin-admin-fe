@@ -34,16 +34,16 @@ function FormBoxRow({
 }: FormBoxRowProps) {
   return (
     <div
-      className={`border-border-control/70 flex min-h-16 border-b last:border-b-0 ${className}`.trim()}
+      className={`border-border-control/70 flex min-h-14 flex-col border-b last:border-b-0 sm:flex-row ${className}`.trim()}
     >
       <div
-        className={`bg-bg-app text-fg-secondary tracking-brand flex w-42.5 shrink-0 items-center px-4 text-[18px] font-semibold ${labelClassName}`.trim()}
+        className={`bg-bg-app text-fg-secondary tracking-brand flex w-full items-center border-b border-white/10 px-4 py-2.5 text-[16px] font-semibold sm:w-42.5 sm:shrink-0 sm:border-b-0 sm:py-0 ${labelClassName}`.trim()}
       >
         <span>{label}</span>
         {required ? <span className="ml-0.5 text-[#ff3b30]">*</span> : null}
       </div>
       <div
-        className={`flex flex-1 items-center px-4 py-2 ${contentClassName}`.trim()}
+        className={`flex w-full flex-1 items-center px-4 py-2.5 sm:py-2 ${contentClassName}`.trim()}
       >
         {children}
       </div>

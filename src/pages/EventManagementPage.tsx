@@ -84,7 +84,7 @@ function EventManagementPage() {
     <div className="bg-bg-app min-h-dvh w-full">
       <Header />
 
-      <div className="mx-auto w-full max-w-270 px-2 pt-16 pb-24">
+      <div className="mx-auto w-full max-w-270 px-2 pt-12 pb-20">
         <PageTitleBar
           title="행사 관리"
           actions={
