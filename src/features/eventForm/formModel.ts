@@ -278,7 +278,10 @@ function mapDetailToRecruit(detail: EventDetailData): EventRecruitFormState {
     recruitEndDateTime: toDateTimeLocalValue(detail.recruitEndDateTime ?? ""),
     recruitCount: Math.max(0, detail.recruitInfo?.recruitCount ?? 0),
     isFullAttendanceRequired: detail.isFullAttendanceRequired ?? true,
-    isRecruitEndOnSelection: false,
+    isRecruitEndOnSelection:
+      detail.recruitInfo?.isRecruitEndOnSelection ??
+      detail.isRecruitEndOnSelection ??
+      false,
   };
 }
 
@@ -533,25 +536,26 @@ export function buildCreateEventRequestBody({
     return fail(getMaxLengthMessage(GUIDELINES_LIMIT.max));
   }
 
-  if (!eventRecruitForm.recruitEndDateTime) {
-    return fail();
-  }
+  let recruitEndDateTimeIso = "";
+  if (!eventRecruitForm.isRecruitEndOnSelection) {
+    if (!eventRecruitForm.recruitEndDateTime) {
+      return fail();
+    }
 
-  const recruitEndDateTimeIso = toIsoDateTime(
-    eventRecruitForm.recruitEndDateTime,
-  );
-  if (!recruitEndDateTimeIso) {
-    return fail();
-  }
+    recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
+    if (!recruitEndDateTimeIso) {
+      return fail();
+    }
 
-  const eventEndDate = getEventEndDateTime(baseInfoForm);
-  if (
-    !isRecruitEndDateWithinEventEndDate(
-      eventRecruitForm.recruitEndDateTime,
-      eventEndDate,
-    )
-  ) {
-    return fail(RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE);
+    const eventEndDate = getEventEndDateTime(baseInfoForm);
+    if (
+      !isRecruitEndDateWithinEventEndDate(
+        eventRecruitForm.recruitEndDateTime,
+        eventEndDate,
+      )
+    ) {
+      return fail(RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE);
+    }
   }
 
   const trimmedCateringDetail = eventTargetForm.cateringDetail.trim();
@@ -587,7 +591,7 @@ export function buildCreateEventRequestBody({
         recruitEndDateTime: recruitEndDateTimeIso,
         recruitCount: Math.max(0, eventRecruitForm.recruitCount),
         isFullAttendanceRequired: eventRecruitForm.isFullAttendanceRequired,
-        isRecruitEndOnSelection: false,
+        isRecruitEndOnSelection: eventRecruitForm.isRecruitEndOnSelection,
       },
       eventTargetDto: {
         truckTypes: eventTargetForm.truckTypes,
