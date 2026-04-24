@@ -1,8 +1,5 @@
 ﻿import { DateRangeField } from "../../components";
-import type {
-  ApprovalFilterPatch,
-  ApprovalFilterState,
-} from "../../types";
+import type { ApprovalFilterPatch, ApprovalFilterState } from "../../types";
 
 type DateFieldProps = {
   value: ApprovalFilterState;
@@ -11,7 +8,7 @@ type DateFieldProps = {
 
 function DateField({ value, onChange }: DateFieldProps) {
   return (
-    <div className="mt-10 flex w-full flex-wrap gap-4">
+    <div className="mt-6 grid w-full grid-cols-1 gap-y-5 lg:mt-8 lg:grid-cols-2 lg:gap-y-4">
       <DateRangeField
         label="요청일"
         startId="requested-date-start"

@@ -15,7 +15,7 @@ const APPROVAL_STATUS_OPTIONS = [
 
 function SerachField({ value, onChange }: SerachFieldProps) {
   return (
-    <div className="flex w-full flex-wrap justify-start gap-20">
+    <div className="grid w-full grid-cols-1 gap-y-5 lg:flex lg:flex-wrap lg:justify-start lg:gap-10">
       <InputWrapper>
         <InputWrapper.Label htmlFor="nickname">닉네임</InputWrapper.Label>
         <InputWrapper.Input

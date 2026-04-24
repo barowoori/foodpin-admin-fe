@@ -225,35 +225,36 @@ export function useEventSectionUpdate({
       return;
     }
 
-    if (!eventRecruitForm.recruitEndDateTime) {
-      alert(REQUIRED_VALIDATION_MESSAGE);
-      return;
-    }
+    let recruitEndDateTimeIso = "";
+    if (!eventRecruitForm.isRecruitEndOnSelection) {
+      if (!eventRecruitForm.recruitEndDateTime) {
+        alert(REQUIRED_VALIDATION_MESSAGE);
+        return;
+      }
 
-    const recruitEndDateTimeIso = toIsoDateTime(
-      eventRecruitForm.recruitEndDateTime,
-    );
-    if (!recruitEndDateTimeIso) {
-      alert(REQUIRED_VALIDATION_MESSAGE);
-      return;
-    }
+      recruitEndDateTimeIso = toIsoDateTime(eventRecruitForm.recruitEndDateTime);
+      if (!recruitEndDateTimeIso) {
+        alert(REQUIRED_VALIDATION_MESSAGE);
+        return;
+      }
 
-    const eventEndDate = getEventEndDateTime(baseInfoForm);
-    if (
-      !isRecruitEndDateWithinEventEndDate(
-        eventRecruitForm.recruitEndDateTime,
-        eventEndDate,
-      )
-    ) {
-      alert("모집마감일은 행사일시 종료일 이전으로 입력해 주세요.");
-      return;
+      const eventEndDate = getEventEndDateTime(baseInfoForm);
+      if (
+        !isRecruitEndDateWithinEventEndDate(
+          eventRecruitForm.recruitEndDateTime,
+          eventEndDate,
+        )
+      ) {
+        alert("모집마감일은 행사일시 종료일 이전으로 입력해 주세요.");
+        return;
+      }
     }
 
     const payload: UpdateEventRecruitPayload = {
       recruitEndDateTime: recruitEndDateTimeIso,
       recruitCount: Math.max(0, eventRecruitForm.recruitCount),
       isFullAttendanceRequired: eventRecruitForm.isFullAttendanceRequired,
-      isRecruitEndOnSelection: false,
+      isRecruitEndOnSelection: eventRecruitForm.isRecruitEndOnSelection,
     };
 
     try {

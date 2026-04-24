@@ -204,12 +204,12 @@ function EventFormPage() {
     <div className="bg-bg-app min-h-dvh w-full">
       <Header />
 
-      <div className="mx-auto flex w-full max-w-270 flex-col gap-10 px-2 pt-16 pb-24">
-        <div className="flex flex-col gap-4 text-[24px] font-semibold">
+      <div className="mx-auto flex w-full max-w-270 flex-col gap-8 px-2 pt-12 pb-20">
+        <div className="flex flex-col gap-3 text-[22px] font-semibold">
           <span className="text-fg-primary">
             {isDetailMode ? "행사 상세 조회" : "행사 등록"}
           </span>
-          <div className="tracking-brand mb-2 text-[16px] text-[#f3f3f3]">
+          <div className="tracking-brand mb-1 text-[14px] text-[#f3f3f3]">
             {isDetailMode
               ? "행사 정보를 확인합니다."
               : "행사 정보를 등록합니다."}
@@ -223,9 +223,9 @@ function EventFormPage() {
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-12">
-          <section className="flex flex-col gap-4">
-            <h2 className="text-fg-secondary text-[18px] font-semibold">
+        <div className="flex flex-col gap-10">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-fg-secondary text-[16px] font-semibold">
               기본정보
             </h2>
             <EventBaseInfo
@@ -237,8 +237,8 @@ function EventFormPage() {
             {renderSectionEditButton("info")}
           </section>
 
-          <section className="flex flex-col gap-4">
-            <h2 className="text-fg-secondary text-[18px] font-semibold">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-fg-secondary text-[16px] font-semibold">
               모집정보
             </h2>
             <EventRecruitInfo
@@ -249,8 +249,8 @@ function EventFormPage() {
             {renderSectionEditButton("recruit")}
           </section>
 
-          <section className="flex flex-col gap-4">
-            <h2 className="text-fg-secondary text-[18px] font-semibold">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-fg-secondary text-[16px] font-semibold">
               운영대상
             </h2>
             <EventTargetInfo
@@ -263,8 +263,8 @@ function EventFormPage() {
             {renderSectionEditButton("target")}
           </section>
 
-          <section className="flex flex-col gap-4">
-            <h2 className="text-fg-secondary text-[18px] font-semibold">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-fg-secondary text-[16px] font-semibold">
               상세정보
             </h2>
             <EventDetailInfo
@@ -275,8 +275,8 @@ function EventFormPage() {
             {renderSectionEditButton("detail")}
           </section>
 
-          <section className="flex flex-col gap-4">
-            <h2 className="text-fg-secondary text-[18px] font-semibold">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-fg-secondary text-[16px] font-semibold">
               모집 URL
             </h2>
             <EventRecruitmentUrlInfo
@@ -341,24 +341,24 @@ function EventFormPage() {
           className="max-w-150 border-[#4a505a] bg-[#2b3038] px-8 py-8"
         >
           <div className="w-full max-w-120">
-            <Modal.Header className="justify-center pt-2 pb-2 text-[26px] font-bold text-[#f3f6fb]">
+            <Modal.Header className="justify-center pt-2 pb-2 text-[22px] font-bold text-[#f3f6fb]">
               행사 삭제
             </Modal.Header>
-            <Modal.Description className="mt-2 text-center text-[16px] font-medium text-[#d5dce6]">
+            <Modal.Description className="mt-2 text-center text-[14px] font-medium text-[#d5dce6]">
               행사를 삭제하시겠습니까?
             </Modal.Description>
             <Modal.ButtonLayout className="mt-8 gap-4">
               <Button
                 onClick={handleDeleteConfirm}
                 disabled={isDeletePending}
-                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[16px] font-semibold text-white hover:bg-[#6f859f]"
+                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[15px] font-semibold text-white hover:bg-[#6f859f]"
               >
                 {isDeletePending ? "삭제 중.." : "확인"}
               </Button>
               <Button
                 onClick={() => setIsDeleteModalOpen(false)}
                 disabled={isDeletePending}
-                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[16px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
+                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[15px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
               >
                 취소
               </Button>
@@ -373,10 +373,10 @@ function EventFormPage() {
           className="max-w-150 border-[#4a505a] bg-[#2b3038] px-8 py-8"
         >
           <div className="w-full max-w-120">
-            <Modal.Header className="justify-center pt-2 pb-2 text-[26px] font-bold text-[#f3f6fb]">
+            <Modal.Header className="justify-center pt-2 pb-2 text-[22px] font-bold text-[#f3f6fb]">
               등록 취소
             </Modal.Header>
-            <Modal.Description className="mt-2 text-center text-[15px] leading-6 font-medium text-[#d5dce6]">
+            <Modal.Description className="mt-2 text-center text-[14px] leading-6 font-medium text-[#d5dce6]">
               입력 중인 내용이 저장되지 않습니다.
               {"\n"}
               목록으로 이동하시겠습니까?
@@ -387,13 +387,13 @@ function EventFormPage() {
                   setIsCancelModalOpen(false);
                   navigate("/events");
                 }}
-                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[16px] font-semibold text-white hover:bg-[#6f859f]"
+                className="border-focus-ring h-11 min-w-28 bg-[#5f738a] text-[15px] font-semibold text-white hover:bg-[#6f859f]"
               >
                 확인
               </Button>
               <Button
                 onClick={() => setIsCancelModalOpen(false)}
-                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[16px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
+                className="h-11 min-w-28 border-[#5d636d] bg-[#343a43] text-[15px] font-semibold text-[#e3e8ee] hover:bg-[#414852]"
               >
                 취소
               </Button>

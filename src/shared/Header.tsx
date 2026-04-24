@@ -32,22 +32,25 @@ function Header() {
 
   return (
     <header className="border-border-control/70 bg-bg-control/90 text-fg-primary sticky top-0 z-20 w-full border-b backdrop-blur">
-      <div className="mx-auto flex w-full max-w-270 items-center justify-between px-2 py-3">
-        <div className="flex items-center gap-10">
-          <span className="font-pretendard tracking-brand text-ui-base leading-none font-semibold">
+      <div className="mx-auto flex w-full max-w-270 flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-start sm:gap-8">
+          <span
+            className="font-pretendard tracking-brand text-ui-base cursor-pointer leading-none font-semibold whitespace-nowrap"
+            onClick={() => navigate("/business")}
+          >
             Foodpin Admin
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 sm:flex">
             <Link
               to="/business"
-              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
             >
               사업자등록 관리
             </Link>
             <Link
               to="/events"
-              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
             >
               행사 관리
             </Link>
@@ -60,7 +63,7 @@ function Header() {
         >
           <button
             type="button"
-            className="bg-bg-app/65 border-border-control flex cursor-pointer items-center gap-3 rounded-full border px-2.5 py-1.5"
+            className="bg-bg-app/65 border-border-control flex cursor-pointer items-center gap-3 rounded-full border px-2.5 py-1.5 whitespace-nowrap"
           >
             {info?.image ? (
               <img
@@ -95,6 +98,21 @@ function Header() {
               로그아웃
             </button>
           </div>
+        </div>
+
+        <div className="flex w-full items-center gap-2 sm:hidden">
+          <Link
+            to="/business"
+            className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
+          >
+            사업자등록 관리
+          </Link>
+          <Link
+            to="/events"
+            className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
+          >
+            행사 관리
+          </Link>
         </div>
       </div>
     </header>

@@ -10,8 +10,8 @@ function UnauthorizedAccessPage() {
 
   return (
     <div className="bg-bg-app font-pretendard flex min-h-dvh items-center justify-center px-4 py-4">
-      <div className="border-border-control bg-bg-control w-full max-w-100 rounded-md border px-6 py-6 text-center shadow-[0_14px_30px_rgba(0,0,0,0.42)]">
-        <h1 className="text-fg-primary text-[26px] font-semibold tracking-[-0.01em]">
+      <div className="border-border-control bg-bg-control w-full max-w-100 rounded-md border px-6 py-5 text-center shadow-[0_14px_30px_rgba(0,0,0,0.42)]">
+        <h1 className="text-fg-primary text-[22px] font-semibold tracking-[-0.01em]">
           접근 권한이 없습니다
         </h1>
 
@@ -23,7 +23,7 @@ function UnauthorizedAccessPage() {
         <div className="mt-5 flex justify-center">
           <Button
             onClick={handleMoveToLogin}
-            className="border-focus-ring h-10 w-full max-w-72 min-w-0 bg-[#5f738a] text-[17px] font-semibold text-[#f3f6fa] hover:bg-[#6f859f] active:bg-[#556981]"
+            className="border-focus-ring h-10 w-full max-w-72 min-w-0 bg-[#5f738a] text-[15px] font-semibold text-[#f3f6fa] hover:bg-[#6f859f] active:bg-[#556981]"
           >
             로그인 화면으로 이동
           </Button>

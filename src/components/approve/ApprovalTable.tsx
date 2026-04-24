@@ -28,7 +28,7 @@ function ApprovalTable({
   isFetching = false,
 }: ApprovalTableProps) {
   return (
-    <section className="mt-16">
+    <section className="mt-12">
       <TableCountControl
         totalCount={totalCount}
         pageSize={pageSize}
@@ -79,7 +79,7 @@ function ApprovalTable({
         currentPage={currentPage}
         onPageChange={onPageChange}
         disabled={isFetching}
-        className="mt-6 text-[28px]"
+        className="mt-5"
       />
     </section>
   );
