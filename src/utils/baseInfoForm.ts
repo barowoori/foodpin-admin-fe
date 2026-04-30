@@ -36,7 +36,7 @@ export const INITIAL_EVENT_FORM_TARGET: EventTargetFormState = {
   truckTypes: [],
   eventCategoryCodeList: [],
   saleType: "NORMAL",
-  priceRange: "",
+  priceRange: "NO_MATTER",
   cateringDetail: "",
 };
 
