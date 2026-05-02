@@ -216,7 +216,7 @@ function EventBaseInfo({
       </FormBox.Row>
 
       <FormBox.Row label="행사명" required>
-        <div className="w-[320px]">
+        <div className="w-80">
           <div className="relative">
             <FormTextArea
               value={value.name}
@@ -260,7 +260,7 @@ function EventBaseInfo({
           value={value.type}
           onChange={(next) => onChange({ type: next as EventType | "" })}
           options={[...EVENT_CATEGORY_OPTIONS]}
-          widthClassName="w-[320px]"
+          widthClassName="w-80"
         />
       </FormBox.Row>
 

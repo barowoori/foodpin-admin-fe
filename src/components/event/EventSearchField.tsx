@@ -20,7 +20,7 @@ function EventSearchField({
   onChange,
 }: EventSearchFieldProps) {
   return (
-    <div className="grid grid-cols-1 gap-y-5 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-6">
+    <div className="grid grid-flow-col grid-cols-1 gap-y-5 md:grid-cols-2 lg:gap-x-10 lg:gap-y-6">
       <InputWrapper>
         <InputWrapper.Label htmlFor="event-search">행사명</InputWrapper.Label>
         <InputWrapper.Input
@@ -36,7 +36,7 @@ function EventSearchField({
           행사지역
         </span>
 
-        <div className="flex w-full flex-col items-start gap-2 lg:w-auto lg:flex-row lg:items-end lg:gap-4">
+        <div className="flex w-full items-start gap-2 lg:w-auto lg:items-end lg:gap-4">
           <FormSelect
             value={value.regionDo}
             onChange={(next) => onChange({ regionDo: next, regionSi: "" })}
@@ -57,4 +57,3 @@ function EventSearchField({
 }
 
 export default EventSearchField;
-
