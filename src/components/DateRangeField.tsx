@@ -82,7 +82,7 @@ function DateRangeField({
         {label}
       </label>
 
-      <div className="flex w-full flex-col items-start gap-2 lg:w-auto lg:flex-row lg:items-center">
+      <div className="flex w-full flex-col items-start gap-2 md:flex-row md:flex-wrap lg:w-auto lg:items-center">
         <div className="flex w-full items-center gap-2 lg:w-auto">
           <InputWrapper.Input
             id={startId}

@@ -8,7 +8,7 @@ type EventDateFieldProps = {
 
 function EventDateField({ value, onChange }: EventDateFieldProps) {
   return (
-    <div className="mt-6 grid grid-cols-1 gap-y-5 lg:mt-7 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-6">
+    <div className="mt-6 grid grid-flow-col grid-cols-2 gap-y-5 lg:mt-7 lg:gap-x-10 lg:gap-y-6">
       <DateRangeField
         label="행사기간"
         startId="event-start-date"

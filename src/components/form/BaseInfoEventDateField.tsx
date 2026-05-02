@@ -514,7 +514,7 @@ function BaseInfoEventDateField({
             readOnly
             value={selectedDatesLabel}
             placeholder="yy/mm/dd, yy/mm/dd, ..."
-            className="w-[320px] pr-10"
+            className="max-w-80 pr-10"
           />
           <button
             type="button"
@@ -558,7 +558,7 @@ function BaseInfoEventDateField({
             readOnly
             value={periodLabel}
             placeholder="yy/mm/dd ~ yy/mm/dd"
-            className="w-[320px] pr-10"
+            className="max-w-80 pr-10"
           />
           <button
             type="button"

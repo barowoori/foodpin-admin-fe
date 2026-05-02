@@ -32,7 +32,7 @@ function Header() {
 
   return (
     <header className="border-border-control/70 bg-bg-control/90 text-fg-primary sticky top-0 z-20 w-full border-b backdrop-blur">
-      <div className="mx-auto flex w-full max-w-270 flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex w-full max-w-270 flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between lg:px-2">
         <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-start sm:gap-8">
           <span
             className="font-pretendard tracking-brand text-ui-base cursor-pointer leading-none font-semibold whitespace-nowrap"

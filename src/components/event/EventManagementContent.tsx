@@ -44,14 +44,16 @@ function EventManagementContent({
 }: EventManagementContentProps) {
   return (
     <>
-      <EventSearchField
-        value={filters}
-        regionDoOptions={regionDoOptions}
-        regionSiOptions={regionSiOptions}
-        onChange={onFilterPatch}
-      />
+      <div className="">
+        <EventSearchField
+          value={filters}
+          regionDoOptions={regionDoOptions}
+          regionSiOptions={regionSiOptions}
+          onChange={onFilterPatch}
+        />
 
-      <EventDateField value={filters} onChange={onFilterPatch} />
+        <EventDateField value={filters} onChange={onFilterPatch} />
+      </div>
 
       <EventTable
         items={items}
