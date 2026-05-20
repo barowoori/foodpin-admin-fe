@@ -3,3 +3,4 @@ export * from "./eventManagement";
 export * from "./dateRange";
 export * from "./baseInfoForm";
 export * from "./scroll";
+export * from "./truckManagement";

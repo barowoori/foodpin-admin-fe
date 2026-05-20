@@ -43,6 +43,12 @@ function Header() {
 
           <div className="hidden items-center gap-2 sm:flex">
             <Link
+              to="/trucks"
+              className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
+            >
+              푸드트럭 관리
+            </Link>
+            <Link
               to="/business"
               className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
             >
@@ -101,6 +107,12 @@ function Header() {
         </div>
 
         <div className="flex w-full items-center gap-2 sm:hidden">
+          <Link
+            to="/trucks"
+            className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"
+          >
+            푸드트럭 관리
+          </Link>
           <Link
             to="/business"
             className="text-fg-secondary hover:text-fg-primary hover:bg-bg-app rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors"

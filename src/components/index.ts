@@ -8,3 +8,4 @@ export { default as Pagination } from "./Pagination";
 export * from "./approve";
 export * from "./event";
 export * from "./form";
+export * from "./truck";

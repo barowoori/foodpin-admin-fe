@@ -17,6 +17,8 @@ function ScrollToTopOnRouteChange() {
 const ApprovalDashboardPage = lazy(
   () => import("./pages/ApprovalDashboardPage"),
 );
+const TruckManagementPage = lazy(() => import("./pages/TruckManagementPage"));
+const TruckFormPage = lazy(() => import("./pages/TruckFormPage"));
 const EventManagementPage = lazy(() => import("./pages/EventManagementPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const UnauthorizedAccessPage = lazy(
@@ -38,6 +40,12 @@ function App() {
         <Route
           path="business"
           element={withSuspense(<ApprovalDashboardPage />)}
+        />
+        <Route path="trucks" element={withSuspense(<TruckManagementPage />)} />
+        <Route path="trucks/form" element={withSuspense(<TruckFormPage />)} />
+        <Route
+          path="trucks/form/:truckId"
+          element={withSuspense(<TruckFormPage />)}
         />
         <Route path="events" element={withSuspense(<EventManagementPage />)} />
         <Route path="events/form" element={withSuspense(<EventFormPage />)} />
