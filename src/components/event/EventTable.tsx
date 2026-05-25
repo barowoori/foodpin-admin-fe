@@ -124,11 +124,15 @@ function EventTable({
                 return (
                   <tr
                     key={row.id}
-                    onClick={() => handleRowClick(row.id)}
-                    className="border-border-control text-fg-primary hover:bg-bg-control/40 cursor-pointer border-b text-center text-[13px]"
+                    className="border-border-control text-fg-primary hover:bg-bg-control/40 border-b text-center text-[13px]"
                   >
                     <td className="px-2 py-4">{row.no}</td>
-                    <td className="px-2 py-4">{row.name}</td>
+                    <td
+                      className="cursor-pointer px-2 py-4 underline"
+                      onClick={() => handleRowClick(row.id)}
+                    >
+                      {row.name}
+                    </td>
                     <td className="px-2 py-4">
                       {row.regionDo}
                       {row.regionSi && row.regionSi !== "-"

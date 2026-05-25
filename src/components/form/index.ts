@@ -1,6 +1,7 @@
 export { default as FormBox } from "./FormBox";
 export { default as FormInput } from "./FormInput";
 export { default as FormTextArea } from "./FormTextArea";
+export { default as FormSelect } from "../FormSelect";
 export { default as EventBaseInfo } from "./EventBaseInfo";
 export { default as BaseInfoEventDateField } from "./BaseInfoEventDateField";
 export { default as EventRecruitInfo } from "./EventRecruitInfo";

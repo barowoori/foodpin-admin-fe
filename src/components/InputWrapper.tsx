@@ -16,12 +16,14 @@ function Label({ children, htmlFor }: LabelProps) {
   );
 }
 
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
+type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+  className?: string;
+};
 
-function Input(props: InputProps) {
+function Input({ className = "", ...props }: InputProps) {
   return (
     <input
-      className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full max-w-40 rounded-lg border px-3 transition outline-none read-only:cursor-default focus:ring-2 sm:w-auto"
+      className={`font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full max-w-40 rounded-lg border px-3 transition outline-none read-only:cursor-default focus:ring-2 sm:w-auto ${className}`.trim()}
       {...props}
     />
   );
