@@ -21,6 +21,8 @@ export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   selectedDates: [],
   periodStartDate: "",
   periodEndDate: "",
+  operatingTimeInputMode: "SCHEDULE",
+  operatingTime: "",
   applyTimeToAll: false,
   periodTimeByDate: {},
 };
@@ -60,10 +62,20 @@ export function applyBaseInfoPatch(
   patch: Partial<BaseInfoFormState>,
 ): BaseInfoFormState {
   const next: BaseInfoFormState = { ...prev, ...patch };
+  const isEventDateModeUpdated = patch.eventDateMode !== undefined;
   const isDateInputUpdated = Array.isArray(patch.selectedDates);
   const isPeriodInputUpdated =
     typeof patch.periodStartDate === "string" ||
     typeof patch.periodEndDate === "string";
+
+  if (isEventDateModeUpdated && patch.eventDateMode === "DATE") {
+    next.periodStartDate = "";
+    next.periodEndDate = "";
+  }
+
+  if (isEventDateModeUpdated && patch.eventDateMode === "PERIOD") {
+    next.selectedDates = [];
+  }
 
   if (isDateInputUpdated) {
     next.periodStartDate = "";

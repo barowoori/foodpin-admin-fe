@@ -5,6 +5,8 @@ export interface EventRow {
   regionSi: string;
   eventStart: string;
   eventEnd: string;
+  eventDateCountText: string;
+  eventPeriodRangeText: string;
   recruitmentDeadline: string;
   clickCount: number;
   createdAt: string;
@@ -13,6 +15,9 @@ export interface EventRow {
 
 export interface EventTableRow extends EventRow {
   no: number;
+  operatingTime: string | null;
+  dates: EventDetailDate[];
+  isCalendarLoading: boolean;
 }
 
 export interface EventRecruitInfo {
@@ -83,10 +88,18 @@ export interface BaseInfoState {
 }
 
 export type EventDateMode = "DATE" | "PERIOD";
+export type EventOperatingTimeMode = "SCHEDULE" | "TEXT";
 
 export interface EventDateTime {
   startTime: string;
   endTime: string;
+}
+
+export interface EventDetailDate {
+  id?: string;
+  date: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }
 
 export interface BaseInfoFormState {
@@ -103,6 +116,8 @@ export interface BaseInfoFormState {
   selectedDates: string[];
   periodStartDate: string;
   periodEndDate: string;
+  operatingTimeInputMode: EventOperatingTimeMode;
+  operatingTime: string;
   applyTimeToAll: boolean;
   periodTimeByDate: Record<string, EventDateTime>;
 }
@@ -143,8 +158,8 @@ export interface EventDetailFormState {
 
 export interface EventDateRequestDto {
   date: string;
-  startTime: string;
-  endTime: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }
 
 export interface EventCreateRequestBody {
@@ -155,6 +170,7 @@ export interface EventCreateRequestBody {
     fileIdList: string[];
     regionCode: string;
     eventDateDtoList: EventDateRequestDto[];
+    operatingTime?: string | null;
     recruitmentUrl: string;
   };
   eventRecruitDto: {

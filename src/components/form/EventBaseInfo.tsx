@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { saveFile } from "../../apis";
-import Button from "../Button";
-import FormSelect from "../FormSelect";
 import type { BaseInfoFormState, EventDateTime, EventType } from "../../types";
 import { REGION_DO_OPTIONS, getRegionSiOptions } from "../../utils";
 import {
   EVENT_NAME_LIMIT,
+  OPERATING_TIME_LIMIT,
   getMaxLengthMessage,
   getMinLengthMessage,
   validateTextLength,
@@ -14,22 +13,25 @@ import {
   getMaxPhotoCountMessage,
   MAX_EVENT_PHOTO_COUNT,
 } from "../../features/eventForm/photoValidation";
+import Button from "../Button";
+import FormSelect from "../FormSelect";
 import BaseInfoEventDateField from "./BaseInfoEventDateField";
+import BaseInfoOperatingTimeField from "./BaseInfoOperatingTimeField";
 import FormBox from "./FormBox";
 import FormInput from "./FormInput";
 import FormTextArea from "./FormTextArea";
 
 const EVENT_CATEGORY_OPTIONS = [
-  { value: "", label: "행사종류를 선택하세요" },
-  { value: "CORPORATE", label: "기업행사" },
-  { value: "PERSONAL", label: "개인행사" },
-  { value: "SCHOOL", label: "학교행사" },
-  { value: "LOCAL", label: "지역행사" },
-  { value: "APARTMENT_MARKET", label: "아파트장터" },
-  { value: "CELEBRITY_SUPPORT", label: "연예인서포트" },
+  { value: "", label: "행사 종류를 선택해 주세요." },
+  { value: "CORPORATE", label: "기업 행사" },
+  { value: "PERSONAL", label: "개인 행사" },
+  { value: "SCHOOL", label: "학교 행사" },
+  { value: "LOCAL", label: "지역 행사" },
+  { value: "APARTMENT_MARKET", label: "아파트 장터" },
+  { value: "CELEBRITY_SUPPORT", label: "연예인 서포트" },
 ] satisfies Array<{ value: EventType | ""; label: string }>;
 
-interface EventBaseInfoProps {
+type EventBaseInfoProps = {
   value: BaseInfoFormState;
   onChange: (patch: Partial<BaseInfoFormState>) => void;
   showNameValidationError?: boolean;
@@ -38,7 +40,7 @@ interface EventBaseInfoProps {
     key: keyof EventDateTime,
     value: string,
   ) => void;
-}
+};
 
 function EventBaseInfo({
   value,
@@ -69,6 +71,7 @@ function EventBaseInfo({
   );
   const hasPhotoPreview = photoPreviewUrls.length > 0;
   const isPhotoLimitReached = value.fileIdList.length >= MAX_EVENT_PHOTO_COUNT;
+  const operatingTimeLength = value.operatingTime.length;
 
   const selectedPhotoLabel = useMemo(() => {
     if (value.fileIdList.length > 0) {
@@ -203,14 +206,14 @@ function EventBaseInfo({
               className="h-11 rounded-sm border-[#cfcfcf] bg-[#efefef] text-[#666666] hover:bg-[#e2e2e2]"
             >
               {isPhotoUploading
-                ? "업로드 중.."
+                ? "업로드 중..."
                 : isPhotoLimitReached
                   ? `최대 ${MAX_EVENT_PHOTO_COUNT}개`
                   : "파일 찾기"}
             </Button>
           </div>
           <p className="text-fg-muted text-xs">
-            이미지 최대 {MAX_EVENT_PHOTO_COUNT}개까지 등록할 수 있습니다.
+            이미지는 최대 {MAX_EVENT_PHOTO_COUNT}개까지 등록할 수 있습니다.
           </p>
         </div>
       </FormBox.Row>
@@ -231,7 +234,7 @@ function EventBaseInfo({
                 onChange({ name: next });
               }}
               onBlur={() => setIsNameTouched(true)}
-              placeholder="행사명을 입력하세요"
+              placeholder="행사명을 입력해 주세요."
               className="min-h-11 resize-y pr-18 pb-7"
             />
             <span
@@ -264,29 +267,47 @@ function EventBaseInfo({
         />
       </FormBox.Row>
 
-      <FormBox.Row
-        label="행사 일시"
-        required
-        contentClassName="items-start py-3"
-      >
+      <FormBox.Row label="행사기간" required contentClassName="items-start py-3">
         <BaseInfoEventDateField
           mode={value.eventDateMode}
           selectedDates={value.selectedDates}
           periodStartDate={value.periodStartDate}
           periodEndDate={value.periodEndDate}
-          periodTimeByDate={value.periodTimeByDate}
-          applyTimeToAll={value.applyTimeToAll}
           onModeChange={(eventDateMode) => onChange({ eventDateMode })}
           onSelectedDatesChange={(selectedDates) => onChange({ selectedDates })}
           onPeriodStartDateChange={(periodStartDate) =>
             onChange({ periodStartDate })
           }
           onPeriodEndDateChange={(periodEndDate) => onChange({ periodEndDate })}
-          onPeriodTimeChange={onPeriodTimeChange}
-          onApplyTimeToAllChange={(applyTimeToAll) =>
-            onChange({ applyTimeToAll })
-          }
         />
+      </FormBox.Row>
+
+      <FormBox.Row label="운영시간" required contentClassName="items-start py-3">
+        <div className="flex w-full flex-col gap-2">
+          <BaseInfoOperatingTimeField
+            eventDateMode={value.eventDateMode}
+            selectedDates={value.selectedDates}
+            periodStartDate={value.periodStartDate}
+            periodEndDate={value.periodEndDate}
+            periodTimeByDate={value.periodTimeByDate}
+            applyTimeToAll={value.applyTimeToAll}
+            operatingTimeInputMode={value.operatingTimeInputMode}
+            operatingTime={value.operatingTime}
+            onOperatingTimeInputModeChange={(operatingTimeInputMode) =>
+              onChange({ operatingTimeInputMode })
+            }
+            onOperatingTimeChange={(operatingTime) => onChange({ operatingTime })}
+            onPeriodTimeChange={onPeriodTimeChange}
+            onApplyTimeToAllChange={(applyTimeToAll) =>
+              onChange({ applyTimeToAll })
+            }
+          />
+          {value.operatingTimeInputMode === "TEXT" ? (
+            <p className="text-fg-muted text-xs">
+              {operatingTimeLength} / {OPERATING_TIME_LIMIT.max}
+            </p>
+          ) : null}
+        </div>
       </FormBox.Row>
 
       <FormBox.Row label="행사 지역" required>

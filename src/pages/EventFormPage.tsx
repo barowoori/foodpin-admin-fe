@@ -62,6 +62,8 @@ function EventFormPage() {
     () =>
       isCreateEventTextLengthValid({
         name: baseInfoForm.name,
+        operatingTimeInputMode: baseInfoForm.operatingTimeInputMode,
+        operatingTime: baseInfoForm.operatingTime,
         saleType: eventTargetForm.saleType,
         cateringDetail: eventTargetForm.cateringDetail,
         description: eventDetailForm.description,
@@ -69,6 +71,8 @@ function EventFormPage() {
       }),
     [
       baseInfoForm.name,
+      baseInfoForm.operatingTime,
+      baseInfoForm.operatingTimeInputMode,
       eventDetailForm.description,
       eventDetailForm.guidelines,
       eventTargetForm.cateringDetail,
