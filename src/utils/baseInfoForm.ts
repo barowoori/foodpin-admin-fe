@@ -62,10 +62,20 @@ export function applyBaseInfoPatch(
   patch: Partial<BaseInfoFormState>,
 ): BaseInfoFormState {
   const next: BaseInfoFormState = { ...prev, ...patch };
+  const isEventDateModeUpdated = patch.eventDateMode !== undefined;
   const isDateInputUpdated = Array.isArray(patch.selectedDates);
   const isPeriodInputUpdated =
     typeof patch.periodStartDate === "string" ||
     typeof patch.periodEndDate === "string";
+
+  if (isEventDateModeUpdated && patch.eventDateMode === "DATE") {
+    next.periodStartDate = "";
+    next.periodEndDate = "";
+  }
+
+  if (isEventDateModeUpdated && patch.eventDateMode === "PERIOD") {
+    next.selectedDates = [];
+  }
 
   if (isDateInputUpdated) {
     next.periodStartDate = "";
