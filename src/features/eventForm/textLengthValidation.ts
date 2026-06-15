@@ -1,6 +1,7 @@
 import type { SaleType } from "../../types";
 
 export const EVENT_NAME_LIMIT = { min: 1, max: 30 } as const;
+export const OPERATING_TIME_LIMIT = { min: 0, max: 50 } as const;
 export const CATERING_DETAIL_LIMIT = { min: 10, max: 10000 } as const;
 export const DESCRIPTION_LIMIT = { min: 10, max: 10000 } as const;
 export const GUIDELINES_LIMIT = { min: 10, max: 10000 } as const;
@@ -43,12 +44,18 @@ export function validateTextLength(
 
 export function isCreateEventTextLengthValid(params: {
   name: string;
+  operatingTimeInputMode: "SCHEDULE" | "TEXT";
+  operatingTime: string;
   saleType: SaleType;
   cateringDetail: string;
   description: string;
   guidelines: string;
 }) {
   const nameValidation = validateTextLength(params.name, EVENT_NAME_LIMIT);
+  const operatingTimeValidation = validateTextLength(
+    params.operatingTime,
+    OPERATING_TIME_LIMIT,
+  );
   const descriptionValidation = validateTextLength(
     params.description,
     DESCRIPTION_LIMIT,
@@ -60,6 +67,8 @@ export function isCreateEventTextLengthValid(params: {
 
   if (
     !nameValidation.isValid ||
+    (params.operatingTimeInputMode === "TEXT" &&
+      !operatingTimeValidation.isValid) ||
     !descriptionValidation.isValid ||
     !guidelinesValidation.isValid
   ) {
@@ -76,4 +85,3 @@ export function isCreateEventTextLengthValid(params: {
   );
   return cateringValidation.isValid;
 }
-

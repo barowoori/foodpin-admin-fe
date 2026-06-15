@@ -52,6 +52,7 @@ export type UpdateEventInfoPayload = {
   fileIdList: string[];
   eventDateDtoList: EventDateRequestDto[];
   regionCode: string;
+  operatingTime: string | null;
 };
 
 export type UpdateEventDetailPayload = Pick<
@@ -96,9 +97,10 @@ export type EventDetailResponse = {
     dates?: Array<{
       id?: string;
       date?: string;
-      startTime?: string;
-      endTime?: string;
+      startTime?: string | null;
+      endTime?: string | null;
     }>;
+    operatingTime?: string | null;
     entryFee?: number;
     electricitySupportAvailability?: boolean | null;
     generatorRequirement?: boolean;

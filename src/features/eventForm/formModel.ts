@@ -26,6 +26,7 @@ import {
   DESCRIPTION_LIMIT,
   EVENT_NAME_LIMIT,
   GUIDELINES_LIMIT,
+  OPERATING_TIME_LIMIT,
   getMaxLengthMessage,
   getMinLengthMessage,
   validateTextLength,
@@ -71,10 +72,11 @@ const EVENT_CATEGORY_CODE_MAP: Record<string, string> = {
   C07: "C07",
 };
 
-const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
-
+const REQUIRED_VALIDATION_MESSAGE = "필수 항목을 입력해 주세요.";
+export const OPERATING_TIME_SELECTION_MESSAGE =
+  "운영시간을 직접 입력하거나 모든 날짜에 시작/종료 시간을 입력해야 합니다. (둘 중 하나만)";
 const RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE =
-  "모집마감일은 행사일시 종료일 이전으로 입력해 주세요.";
+  "모집마감일은 행사 종료일 이전으로 입력해 주세요.";
 
 export type EventDetailData = NonNullable<EventDetailResponse["data"]>;
 
@@ -97,6 +99,18 @@ export type BuildCreateEventRequestBodyResult =
       errorMessage: string;
     };
 
+type EventInfoFieldsResult =
+  | {
+      eventDateDtoList: EventDateRequestDto[];
+      operatingTime: string | null;
+      errorMessage?: never;
+    }
+  | {
+      eventDateDtoList: null;
+      operatingTime: null;
+      errorMessage: string;
+    };
+
 function normalizeEventCategoryCode(code: string) {
   const normalized = code.trim().toUpperCase();
   if (!normalized) {
@@ -114,9 +128,9 @@ export function normalizeEventCategoryCodes(codes: string[]) {
   return [...new Set(codes.map(normalizeEventCategoryCode).filter(Boolean))];
 }
 
-function normalizeTimeValue(value: string) {
+function normalizeOptionalTimeValue(value: string) {
   if (!value) {
-    return "00:00:00";
+    return null;
   }
 
   return value.length === 5 ? `${value}:00` : value;
@@ -220,6 +234,18 @@ function isContinuousDates(dates: string[]) {
   return true;
 }
 
+function getSortedSelectedDates(selectedDates: string[]) {
+  return [...new Set(selectedDates)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
+export function getActiveEventDates(baseInfoForm: BaseInfoFormState) {
+  if (baseInfoForm.eventDateMode === "PERIOD") {
+    return getIsoDateRange(baseInfoForm.periodStartDate, baseInfoForm.periodEndDate);
+  }
+
+  return getSortedSelectedDates(baseInfoForm.selectedDates);
+}
+
 function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
   const regionCode =
     detail.regions?.find((region) => typeof region?.code === "string")?.code ??
@@ -249,6 +275,7 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
   });
 
   const usePeriodMode = isContinuousDates(sortedDates);
+  const operatingTime = detail.operatingTime ?? "";
 
   return {
     ...INITIAL_EVENT_FORM_BASE_INFO,
@@ -275,6 +302,8 @@ function mapDetailToBaseInfo(detail: EventDetailData): BaseInfoFormState {
     periodEndDate: usePeriodMode
       ? (sortedDates[sortedDates.length - 1] ?? "")
       : "",
+    operatingTimeInputMode: operatingTime ? "TEXT" : "SCHEDULE",
+    operatingTime,
     applyTimeToAll: false,
     periodTimeByDate,
   };
@@ -343,46 +372,96 @@ export function mapDetailToEventFormState(
 export function buildEventDateDtoList(
   baseInfoForm: BaseInfoFormState,
 ): EventDateRequestDto[] {
-  if (baseInfoForm.eventDateMode === "PERIOD") {
-    const dates = getIsoDateRange(
-      baseInfoForm.periodStartDate,
-      baseInfoForm.periodEndDate,
-    );
+  const activeDates = getActiveEventDates(baseInfoForm);
 
-    return dates.map((date) => {
-      const time = baseInfoForm.periodTimeByDate[date];
-
-      return {
-        date,
-        startTime: normalizeTimeValue(time?.startTime ?? ""),
-        endTime: normalizeTimeValue(time?.endTime ?? ""),
-      };
-    });
-  }
-
-  return baseInfoForm.selectedDates.map((date) => {
+  return activeDates.map((date) => {
     const time = baseInfoForm.periodTimeByDate[date];
-
     return {
       date,
-      startTime: normalizeTimeValue(time?.startTime ?? ""),
-      endTime: normalizeTimeValue(time?.endTime ?? ""),
+      startTime:
+        baseInfoForm.operatingTimeInputMode === "TEXT"
+          ? null
+          : normalizeOptionalTimeValue(time?.startTime ?? ""),
+      endTime:
+        baseInfoForm.operatingTimeInputMode === "TEXT"
+          ? null
+          : normalizeOptionalTimeValue(time?.endTime ?? ""),
     };
   });
 }
 
-export function getEventEndDate(baseInfoForm: BaseInfoFormState) {
-  if (baseInfoForm.eventDateMode === "PERIOD") {
-    return baseInfoForm.periodEndDate;
+export function buildEventInfoRequestFields(
+  baseInfoForm: BaseInfoFormState,
+): EventInfoFieldsResult {
+  const eventDateDtoList = buildEventDateDtoList(baseInfoForm);
+
+  if (eventDateDtoList.length === 0) {
+    return {
+      eventDateDtoList: null,
+      operatingTime: null,
+      errorMessage: REQUIRED_VALIDATION_MESSAGE,
+    };
   }
 
-  if (baseInfoForm.selectedDates.length === 0) {
+  const trimmedOperatingTime = baseInfoForm.operatingTime.trim();
+
+  if (baseInfoForm.operatingTimeInputMode === "TEXT") {
+    const operatingTimeValidation = validateTextLength(
+      trimmedOperatingTime,
+      OPERATING_TIME_LIMIT,
+    );
+
+    if (operatingTimeValidation.isOverMax) {
+      return {
+        eventDateDtoList: null,
+        operatingTime: null,
+        errorMessage: getMaxLengthMessage(OPERATING_TIME_LIMIT.max),
+      };
+    }
+
+    if (!trimmedOperatingTime) {
+      return {
+        eventDateDtoList: null,
+        operatingTime: null,
+        errorMessage: OPERATING_TIME_SELECTION_MESSAGE,
+      };
+    }
+
+    return {
+      eventDateDtoList: eventDateDtoList.map((entry) => ({
+        date: entry.date,
+        startTime: null,
+        endTime: null,
+      })),
+      operatingTime: trimmedOperatingTime,
+    };
+  }
+
+  const hasAllDateTimes = eventDateDtoList.every(
+    (entry) => Boolean(entry.startTime) && Boolean(entry.endTime),
+  );
+
+  if (!hasAllDateTimes) {
+    return {
+      eventDateDtoList: null,
+      operatingTime: null,
+      errorMessage: OPERATING_TIME_SELECTION_MESSAGE,
+    };
+  }
+
+  return {
+    eventDateDtoList,
+    operatingTime: null,
+  };
+}
+
+export function getEventEndDate(baseInfoForm: BaseInfoFormState) {
+  const activeDates = getActiveEventDates(baseInfoForm);
+  if (activeDates.length === 0) {
     return "";
   }
 
-  return baseInfoForm.selectedDates.reduce((latest, current) =>
-    current > latest ? current : latest,
-  );
+  return activeDates[activeDates.length - 1] ?? "";
 }
 
 export function getEventEndDateTime(baseInfoForm: BaseInfoFormState) {
@@ -496,9 +575,9 @@ export function buildCreateEventRequestBody({
     return fail();
   }
 
-  const eventDateDtoList = buildEventDateDtoList(baseInfoForm);
-  if (eventDateDtoList.length === 0) {
-    return fail();
+  const eventInfoFields = buildEventInfoRequestFields(baseInfoForm);
+  if (!eventInfoFields.eventDateDtoList) {
+    return fail(eventInfoFields.errorMessage);
   }
 
   if (eventTargetForm.truckTypes.length === 0) {
@@ -591,7 +670,8 @@ export function buildCreateEventRequestBody({
         expectedParticipants: baseInfoForm.expectedParticipants,
         fileIdList: baseInfoForm.fileIdList,
         regionCode,
-        eventDateDtoList,
+        eventDateDtoList: eventInfoFields.eventDateDtoList,
+        operatingTime: eventInfoFields.operatingTime,
         recruitmentUrl,
       },
       eventRecruitDto: {

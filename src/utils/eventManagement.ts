@@ -4,6 +4,7 @@ import guCsvRaw from "../data/gu.csv?raw";
 import gunCsvRaw from "../data/gun.csv?raw";
 import type { EventListParams } from "../apis";
 import type {
+  EventDetailDate,
   EventFilterState,
   EventListResult,
   EventTableRow,
@@ -14,6 +15,16 @@ type CsvRow = Record<string, string>;
 export type RegionSelectOption = {
   value: string;
   label: string;
+};
+
+export type EventCalendarData = {
+  operatingTime: string | null;
+  dates: EventDetailDate[];
+};
+
+export type EventCalendarState = {
+  calendarData?: EventCalendarData | null;
+  isLoading: boolean;
 };
 
 const SELECT_ALL_OPTION: RegionSelectOption = { value: "", label: "전체" };
@@ -242,16 +253,60 @@ function toDate(value: string | null | undefined) {
   return value.split("T")[0];
 }
 
+function formatDate(value: string) {
+  return value ? value.replace(/-/g, ".") : "-";
+}
+
+function getSortedDetailDates(dates: EventDetailDate[]) {
+  return [...dates]
+    .filter((entry) => Boolean(entry.date))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+}
+
+function buildEventPeriodTexts(params: {
+  eventStart: string;
+  eventEnd: string;
+  calendarState?: EventCalendarState;
+}) {
+  const sortedDates = getSortedDetailDates(params.calendarState?.calendarData?.dates ?? []);
+  const firstDate = sortedDates[0]?.date ?? params.eventStart;
+  const lastDate =
+    sortedDates[sortedDates.length - 1]?.date ?? params.eventEnd ?? params.eventStart;
+  const eventDateCountText =
+    sortedDates.length > 0
+      ? `${sortedDates.length}일`
+      : params.calendarState?.isLoading
+        ? "확인 중"
+        : "-";
+
+  return {
+    eventDateCountText,
+    eventPeriodRangeText:
+      firstDate || lastDate
+        ? `${formatDate(firstDate)} ~ ${formatDate(lastDate || firstDate)}`
+        : "-",
+  };
+}
+
 export function mapEventTableRows(
   data: EventListResult | undefined,
   page: number,
   size: number,
+  calendarStateById: Record<string, EventCalendarState | undefined> = {},
 ): EventTableRow[] {
   const resolvedPage = data?.page ?? page;
   const resolvedSize = data?.size ?? size;
 
   return (data?.content ?? []).map((item, index) => {
     const { regionDo, regionSi } = splitRegionName(item.region);
+    const eventStart = toDate(item.startDate);
+    const eventEnd = toDate(item.endDate);
+    const calendarState = calendarStateById[item.id];
+    const { eventDateCountText, eventPeriodRangeText } = buildEventPeriodTexts({
+      eventStart,
+      eventEnd,
+      calendarState,
+    });
 
     return {
       no: resolvedPage * resolvedSize + index + 1,
@@ -259,12 +314,17 @@ export function mapEventTableRows(
       name: item.name ?? "-",
       regionDo,
       regionSi,
-      eventStart: toDate(item.startDate),
-      eventEnd: toDate(item.endDate),
+      eventStart,
+      eventEnd,
+      eventDateCountText,
+      eventPeriodRangeText,
       recruitmentDeadline: toDate(item.recruitEndDateTime),
       clickCount: item.recruitmentUrlClickCount ?? 0,
       createdAt: toDate(item.createdAt) || toDate(data?.createAt),
       isHidden: item.isHidden,
+      operatingTime: calendarState?.calendarData?.operatingTime ?? null,
+      dates: getSortedDetailDates(calendarState?.calendarData?.dates ?? []),
+      isCalendarLoading: calendarState?.isLoading ?? false,
     };
   });
 }

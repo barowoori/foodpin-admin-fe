@@ -19,7 +19,7 @@ import type {
   EventTargetFormState,
 } from "../../types";
 import {
-  buildEventDateDtoList,
+  buildEventInfoRequestFields,
   getEventEndDateTime,
   isRecruitEndDateWithinEventEndDate,
   normalizeEventCategoryCodes,
@@ -46,7 +46,9 @@ type UseEventSectionUpdateParams = {
   eventDetailForm: EventDetailFormState;
 };
 
-const REQUIRED_VALIDATION_MESSAGE = "필수 사항을 입력해주세요.";
+const REQUIRED_VALIDATION_MESSAGE = "필수 항목을 입력해 주세요.";
+const RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE =
+  "모집마감일은 행사 종료일 이전으로 입력해 주세요.";
 
 function toIsoDateTime(value: string) {
   const parsed = new Date(value);
@@ -140,9 +142,14 @@ export function useEventSectionUpdate({
     }
 
     const regionCode = baseInfoForm.regionSi || baseInfoForm.regionDo;
-    const eventDateDtoList = buildEventDateDtoList(baseInfoForm);
-    if (!regionCode || eventDateDtoList.length === 0) {
+    if (!regionCode) {
       alert(REQUIRED_VALIDATION_MESSAGE);
+      return;
+    }
+
+    const eventInfoFields = buildEventInfoRequestFields(baseInfoForm);
+    if (!eventInfoFields.eventDateDtoList) {
+      alert(eventInfoFields.errorMessage);
       return;
     }
 
@@ -156,8 +163,9 @@ export function useEventSectionUpdate({
       type: baseInfoForm.type,
       expectedParticipants: baseInfoForm.expectedParticipants,
       fileIdList: baseInfoForm.fileIdList,
-      eventDateDtoList,
+      eventDateDtoList: eventInfoFields.eventDateDtoList,
       regionCode,
+      operatingTime: eventInfoFields.operatingTime,
     };
 
     try {
@@ -252,7 +260,7 @@ export function useEventSectionUpdate({
           eventEndDate,
         )
       ) {
-        alert("모집마감일은 행사일시 종료일 이전으로 입력해 주세요.");
+        alert(RECRUIT_END_DATE_OUT_OF_RANGE_MESSAGE);
         return;
       }
     }

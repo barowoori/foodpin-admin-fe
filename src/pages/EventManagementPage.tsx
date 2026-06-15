@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getEvents, updateEventHidden } from "../apis";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getEventDetail, getEvents, updateEventHidden } from "../apis";
 import { Button, EventManagementContent, PageTitleBar } from "../components";
 import { Header } from "../shared";
 import type { EventFilterPatch, EventFilterState } from "../types";
@@ -10,6 +15,7 @@ import {
   INITIAL_EVENT_FILTERS,
   mapEventTableRows,
   REGION_DO_OPTIONS,
+  type EventCalendarState,
 } from "../utils";
 
 function EventManagementPage() {
@@ -44,9 +50,50 @@ function EventManagementPage() {
     },
   });
 
+  const eventDetailQueries = useQueries({
+    queries: (data?.content ?? []).map((item) => ({
+      queryKey: ["event-list-detail", item.id],
+      queryFn: () => getEventDetail(item.id),
+      enabled: Boolean(item.id),
+      staleTime: 60 * 1000,
+    })),
+  });
+
+  const eventCalendarStateById = useMemo(() => {
+    const nextState: Record<string, EventCalendarState | undefined> = {};
+
+    (data?.content ?? []).forEach((item, index) => {
+      const query = eventDetailQueries[index];
+      nextState[item.id] = {
+        isLoading: Boolean(query?.isLoading || query?.isFetching),
+        calendarData: query?.data
+          ? {
+              operatingTime: query.data.operatingTime ?? null,
+              dates: (query.data.dates ?? [])
+                .filter((entry) => Boolean(entry?.date))
+                .map((entry) => ({
+                  id: entry?.id,
+                  date: entry?.date ?? "",
+                  startTime: entry?.startTime ?? null,
+                  endTime: entry?.endTime ?? null,
+                })),
+            }
+          : undefined,
+      };
+    });
+
+    return nextState;
+  }, [data?.content, eventDetailQueries]);
+
   const items = useMemo(
-    () => mapEventTableRows(data, appliedFilters.page, appliedFilters.size),
-    [appliedFilters.page, appliedFilters.size, data],
+    () =>
+      mapEventTableRows(
+        data,
+        appliedFilters.page,
+        appliedFilters.size,
+        eventCalendarStateById,
+      ),
+    [appliedFilters.page, appliedFilters.size, data, eventCalendarStateById],
   );
 
   const handleFilterPatch = (patch: EventFilterPatch) => {

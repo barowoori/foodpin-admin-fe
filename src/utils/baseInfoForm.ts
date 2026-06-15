@@ -21,6 +21,8 @@ export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   selectedDates: [],
   periodStartDate: "",
   periodEndDate: "",
+  operatingTimeInputMode: "SCHEDULE",
+  operatingTime: "",
   applyTimeToAll: false,
   periodTimeByDate: {},
 };

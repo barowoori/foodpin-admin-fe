@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import CalendarIcon from "../../assets/calendar.svg?react";
-import type { EventDateMode, EventDateTime } from "../../types";
+import type { EventDateMode } from "../../types";
 import {
   formatIsoDate,
   formatIsoDateCompact,
-  getIsoDateRange,
   parseIsoDate,
 } from "../../utils";
 import FormInput from "./FormInput";
@@ -14,235 +13,15 @@ type BaseInfoEventDateFieldProps = {
   selectedDates: string[];
   periodStartDate: string;
   periodEndDate: string;
-  periodTimeByDate: Record<string, EventDateTime>;
-  applyTimeToAll: boolean;
   onModeChange: (mode: EventDateMode) => void;
   onSelectedDatesChange: (next: string[]) => void;
   onPeriodStartDateChange: (value: string) => void;
   onPeriodEndDateChange: (value: string) => void;
-  onPeriodTimeChange: (
-    date: string,
-    key: keyof EventDateTime,
-    value: string,
-  ) => void;
-  onApplyTimeToAllChange: (value: boolean) => void;
 };
 
 type CalendarMode = "MULTI" | "RANGE";
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
-
-function padTwoDigits(value: number) {
-  return String(value).padStart(2, "0");
-}
-
-const TIME_STEP_MINUTES = 1;
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => hour);
-const MINUTE_OPTIONS = Array.from(
-  { length: 60 / TIME_STEP_MINUTES },
-  (_, index) => index * TIME_STEP_MINUTES,
-);
-
-function toMinutes(time: string) {
-  const match = time.match(/^(\d{2}):(\d{2})$/);
-  if (!match) {
-    return null;
-  }
-
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-
-  if (
-    Number.isNaN(hours) ||
-    Number.isNaN(minutes) ||
-    hours < 0 ||
-    hours > 23 ||
-    minutes < 0 ||
-    minutes > 59
-  ) {
-    return null;
-  }
-
-  return hours * 60 + minutes;
-}
-
-type TimePickerFieldProps = {
-  value: string;
-  onChange: (value: string) => void;
-  minTime?: string;
-};
-
-function TimePickerField({ value, onChange, minTime }: TimePickerFieldProps) {
-  const pickerRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState<"HOUR" | "MINUTE">("HOUR");
-  const [selectedHour, setSelectedHour] = useState<number | null>(null);
-  const minMinutes = useMemo(() => toMinutes(minTime ?? ""), [minTime]);
-
-  const closePicker = () => {
-    setIsOpen(false);
-    setStep("HOUR");
-    setSelectedHour(null);
-  };
-
-  useEffect(() => {
-    const handleOutsidePointerDown = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as Node | null;
-      if (!target || !pickerRef.current) {
-        return;
-      }
-
-      if (!pickerRef.current.contains(target)) {
-        setIsOpen(false);
-        setStep("HOUR");
-        setSelectedHour(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsidePointerDown);
-    document.addEventListener("touchstart", handleOutsidePointerDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsidePointerDown);
-      document.removeEventListener("touchstart", handleOutsidePointerDown);
-    };
-  }, []);
-
-  const isHourDisabled = (hour: number) => {
-    if (minMinutes === null) {
-      return false;
-    }
-
-    const latestMinuteInHour = hour * 60 + 59;
-    return latestMinuteInHour < minMinutes;
-  };
-
-  const isMinuteDisabled = (minute: number) => {
-    if (selectedHour === null || minMinutes === null) {
-      return false;
-    }
-
-    return selectedHour * 60 + minute < minMinutes;
-  };
-
-  return (
-    <div ref={pickerRef} className="relative w-34">
-      <button
-        type="button"
-        onClick={() => {
-          if (isOpen) {
-            closePicker();
-            return;
-          }
-
-          setStep("HOUR");
-          setSelectedHour(null);
-          setIsOpen(true);
-        }}
-        className="font-pretendard border-border-control bg-bg-control text-ui-sm text-fg-primary placeholder:text-fg-muted focus:border-focus-ring focus:ring-focus-ring/30 h-11 w-full rounded-lg border px-3 text-left transition outline-none focus:ring-2"
-      >
-        {value || "HH:mm"}
-        <span className="text-fg-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[11px]">
-          v
-        </span>
-      </button>
-      {isOpen ? (
-        <div className="border-border-control bg-bg-app absolute top-12 left-0 z-40 w-60 rounded-lg border p-2 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-fg-subtle text-[12px] font-medium">
-              {step === "HOUR" ? "Hour" : "Minute"}
-            </span>
-            {step === "MINUTE" ? (
-              <button
-                type="button"
-                onClick={() => setStep("HOUR")}
-                className="text-fg-muted hover:text-fg-secondary text-[12px]"
-              >
-                Back
-              </button>
-            ) : null}
-          </div>
-
-          {step === "HOUR" ? (
-            <div className="grid grid-cols-4 gap-1 overflow-y-auto pr-1">
-              {HOUR_OPTIONS.map((hour) => {
-                const isDisabled = isHourDisabled(hour);
-
-                return (
-                  <button
-                    key={hour}
-                    type="button"
-                    disabled={isDisabled}
-                    onClick={() => {
-                      setSelectedHour(hour);
-                      setStep("MINUTE");
-                    }}
-                    className={`h-8 rounded-md text-[13px] transition ${
-                      isDisabled
-                        ? "text-fg-muted/45 cursor-not-allowed"
-                        : "text-fg-subtle hover:bg-bg-control"
-                    }`.trim()}
-                  >
-                    {padTwoDigits(hour)}
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid max-h-53 grid-cols-4 gap-1 overflow-y-auto pr-1">
-              {MINUTE_OPTIONS.map((minute) => {
-                const minuteLabel = padTwoDigits(minute);
-                const isDisabled = isMinuteDisabled(minute);
-                const nextValue =
-                  selectedHour === null
-                    ? ""
-                    : `${padTwoDigits(selectedHour)}:${minuteLabel}`;
-
-                return (
-                  <button
-                    key={minute}
-                    type="button"
-                    disabled={isDisabled || selectedHour === null}
-                    onClick={() => {
-                      if (!nextValue) {
-                        return;
-                      }
-
-                      onChange(nextValue);
-                      closePicker();
-                    }}
-                    className={`h-8 rounded-md text-[13px] transition ${
-                      isDisabled || selectedHour === null
-                        ? "text-fg-muted/45 cursor-not-allowed"
-                        : nextValue === value
-                          ? "bg-focus-ring text-fg-primary"
-                          : "text-fg-subtle hover:bg-bg-control"
-                    }`.trim()}
-                  >
-                    {minuteLabel}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mt-2 flex justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                onChange("");
-                closePicker();
-              }}
-              className="text-fg-muted hover:text-fg-secondary text-[12px]"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 function getInitialMonth(anchorDate: string) {
   const parsed = parseIsoDate(anchorDate);
@@ -270,8 +49,7 @@ function buildMonthCells(viewMonth: Date) {
   }
 
   for (let day = 1; day <= lastDate; day += 1) {
-    const date = new Date(year, month, day);
-    cells.push(formatIsoDate(date));
+    cells.push(formatIsoDate(new Date(year, month, day)));
   }
 
   while (cells.length % 7 !== 0) {
@@ -286,14 +64,10 @@ function BaseInfoEventDateField({
   selectedDates,
   periodStartDate,
   periodEndDate,
-  periodTimeByDate,
-  applyTimeToAll,
   onModeChange,
   onSelectedDatesChange,
   onPeriodStartDateChange,
   onPeriodEndDateChange,
-  onPeriodTimeChange,
-  onApplyTimeToAllChange,
 }: BaseInfoEventDateFieldProps) {
   const dateCalendarAreaRef = useRef<HTMLDivElement>(null);
   const periodCalendarAreaRef = useRef<HTMLDivElement>(null);
@@ -309,17 +83,6 @@ function BaseInfoEventDateField({
   const selectedDateSet = useMemo(
     () => new Set(selectedDates),
     [selectedDates],
-  );
-  const periodDates = useMemo(
-    () => getIsoDateRange(periodStartDate, periodEndDate),
-    [periodStartDate, periodEndDate],
-  );
-  const activeDates = useMemo(
-    () =>
-      mode === "PERIOD"
-        ? periodDates
-        : selectedDates.slice().sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
-    [mode, periodDates, selectedDates],
   );
   const selectedDatesLabel = selectedDates
     .slice()
@@ -564,9 +327,7 @@ function BaseInfoEventDateField({
             type="button"
             aria-label="기간 선택"
             onClick={() => {
-              setPeriodCalendarMonth(
-                getInitialMonth(periodStartDate || periodEndDate),
-              );
+              setPeriodCalendarMonth(getInitialMonth(periodStartDate || periodEndDate));
               setPeriodCalendarOpen((prev) => !prev);
               setDateCalendarOpen(false);
             }}
@@ -585,62 +346,6 @@ function BaseInfoEventDateField({
             : null}
         </div>
       </div>
-
-      {activeDates.length > 0 ? (
-        <div className="mt-1 flex flex-col gap-2 pl-2">
-          {activeDates.map((date, index) => {
-            const currentTime = periodTimeByDate[date] ?? {
-              startTime: "",
-              endTime: "",
-            };
-            const currentEndTimeMinutes = toMinutes(currentTime.endTime);
-
-            return (
-              <div key={date} className="flex items-center gap-2">
-                <span className="text-fg-subtle w-18 text-[15px] font-medium">
-                  {formatIsoDateCompact(date)}
-                </span>
-                <TimePickerField
-                  value={currentTime.startTime}
-                  onChange={(nextValue) => {
-                    onPeriodTimeChange(date, "startTime", nextValue);
-
-                    const nextStartTimeMinutes = toMinutes(nextValue);
-                    if (
-                      nextStartTimeMinutes !== null &&
-                      currentEndTimeMinutes !== null &&
-                      currentEndTimeMinutes < nextStartTimeMinutes
-                    ) {
-                      onPeriodTimeChange(date, "endTime", "");
-                    }
-                  }}
-                />
-                <span className="text-fg-subtle text-[15px]">~</span>
-                <TimePickerField
-                  value={currentTime.endTime}
-                  minTime={currentTime.startTime}
-                  onChange={(nextValue) =>
-                    onPeriodTimeChange(date, "endTime", nextValue)
-                  }
-                />
-                {index === 0 ? (
-                  <label className="text-fg-subtle inline-flex items-center gap-1.5 text-[15px]">
-                    <input
-                      type="checkbox"
-                      checked={applyTimeToAll}
-                      onChange={(event) =>
-                        onApplyTimeToAllChange(event.target.checked)
-                      }
-                      className="border-border-control bg-bg-app accent-focus-ring h-4 w-4"
-                    />
-                    시간 전체적용
-                  </label>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
     </div>
   );
 }
