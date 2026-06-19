@@ -7,6 +7,8 @@ import type {
 } from "../types";
 import { getIsoDateRange } from "./dateRange";
 
+export const DEFAULT_OPERATING_TIME_VALUE = "08:00";
+
 export const INITIAL_EVENT_FORM_BASE_INFO: BaseInfoFormState = {
   name: "",
   type: "",
@@ -52,8 +54,8 @@ export const INITIAL_EVENT_FORM_DETAIL: EventDetailFormState = {
 
 function createEmptyTimeSlot(): EventDateTime {
   return {
-    startTime: "",
-    endTime: "",
+    startTime: DEFAULT_OPERATING_TIME_VALUE,
+    endTime: DEFAULT_OPERATING_TIME_VALUE,
   };
 }
 
@@ -100,6 +102,8 @@ export function applyBaseInfoPatch(
       : [...new Set(next.selectedDates)].sort((a, b) =>
           a < b ? -1 : a > b ? 1 : 0,
         );
+  const shouldShareScheduleAcrossDates =
+    next.operatingTimeInputMode === "SCHEDULE";
   const normalizedTimeByDate: Record<string, EventDateTime> = {};
 
   activeDates.forEach((date) => {
@@ -109,7 +113,7 @@ export function applyBaseInfoPatch(
 
   next.periodTimeByDate = normalizedTimeByDate;
 
-  if (next.applyTimeToAll && activeDates.length > 0) {
+  if (shouldShareScheduleAcrossDates && activeDates.length > 0) {
     const firstDate = activeDates[0];
     const firstTime = next.periodTimeByDate[firstDate] ?? createEmptyTimeSlot();
 
@@ -118,20 +122,10 @@ export function applyBaseInfoPatch(
     });
   }
 
-  if (
-    patch.applyTimeToAll === false &&
-    prev.applyTimeToAll &&
-    activeDates.length > 0
-  ) {
-    const clearedTimeByDate: Record<string, EventDateTime> = {};
-    activeDates.forEach((date) => {
-      clearedTimeByDate[date] = createEmptyTimeSlot();
-    });
-    next.periodTimeByDate = clearedTimeByDate;
-  }
-
   if (activeDates.length === 0) {
     next.applyTimeToAll = false;
+  } else {
+    next.applyTimeToAll = shouldShareScheduleAcrossDates;
   }
 
   return next;
@@ -147,7 +141,7 @@ export function applyPeriodTimeChange(
   const current = nextTimeByDate[date] ?? createEmptyTimeSlot();
   nextTimeByDate[date] = { ...current, [key]: value };
 
-  if (prev.applyTimeToAll) {
+  if (prev.operatingTimeInputMode === "SCHEDULE" || prev.applyTimeToAll) {
     Object.keys(nextTimeByDate).forEach((targetDate) => {
       nextTimeByDate[targetDate] = {
         ...nextTimeByDate[targetDate],

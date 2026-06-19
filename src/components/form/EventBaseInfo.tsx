@@ -290,7 +290,6 @@ function EventBaseInfo({
             periodStartDate={value.periodStartDate}
             periodEndDate={value.periodEndDate}
             periodTimeByDate={value.periodTimeByDate}
-            applyTimeToAll={value.applyTimeToAll}
             operatingTimeInputMode={value.operatingTimeInputMode}
             operatingTime={value.operatingTime}
             onOperatingTimeInputModeChange={(operatingTimeInputMode) =>
@@ -298,9 +297,6 @@ function EventBaseInfo({
             }
             onOperatingTimeChange={(operatingTime) => onChange({ operatingTime })}
             onPeriodTimeChange={onPeriodTimeChange}
-            onApplyTimeToAllChange={(applyTimeToAll) =>
-              onChange({ applyTimeToAll })
-            }
           />
           {value.operatingTimeInputMode === "TEXT" ? (
             <p className="text-fg-muted text-xs">

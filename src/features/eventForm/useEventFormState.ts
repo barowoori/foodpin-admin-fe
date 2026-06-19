@@ -48,7 +48,7 @@ export function useEventFormState() {
 
   const hydrateFromDetail = useCallback((detail: EventDetailData) => {
     const mappedState = mapDetailToEventFormState(detail);
-    setBaseInfoForm(mappedState.baseInfoForm);
+    setBaseInfoForm(applyBaseInfoPatch(mappedState.baseInfoForm, {}));
     setEventRecruitForm(mappedState.eventRecruitForm);
     setEventTargetForm(mappedState.eventTargetForm);
     setEventDetailForm(mappedState.eventDetailForm);
