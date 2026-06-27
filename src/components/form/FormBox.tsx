@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 type FormBoxProps = {
   children: ReactNode;
   className?: string;
+  allowOverflow?: boolean;
 };
 
 type FormBoxRowProps = {
@@ -14,10 +15,16 @@ type FormBoxRowProps = {
   contentClassName?: string;
 };
 
-function FormBoxRoot({ children, className = "" }: FormBoxProps) {
+function FormBoxRoot({
+  children,
+  className = "",
+  allowOverflow = false,
+}: FormBoxProps) {
   return (
     <section
-      className={`border-border-control/80 bg-bg-control overflow-hidden rounded-xl border shadow-[0_8px_24px_rgba(0,0,0,0.28)] ${className}`.trim()}
+      className={`border-border-control/80 bg-bg-control rounded-xl border shadow-[0_8px_24px_rgba(0,0,0,0.28)] ${
+        allowOverflow ? "overflow-visible" : "overflow-hidden"
+      } ${className}`.trim()}
     >
       {children}
     </section>
