@@ -88,6 +88,10 @@ export function createEmptyTruckMenuFormItem(): TruckMenuFormItem {
 export const INITIAL_TRUCK_FORM_STATE: TruckFormStateBundle = {
   ownerForm: {
     ownerMemberId: "",
+    ownerMemberNickname: "",
+    ownerMemberPhone: "",
+    ownerMemberEmail: "",
+    ownerSocialLoginType: "",
     managerMemberIdsText: "",
   },
   basicInfoForm: {
@@ -275,6 +279,10 @@ export function mapDetailToTruckFormState(detail: TruckDetailData): TruckFormSta
   return {
     ownerForm: {
       ownerMemberId: "",
+      ownerMemberNickname: "",
+      ownerMemberPhone: "",
+      ownerMemberEmail: "",
+      ownerSocialLoginType: "",
       managerMemberIdsText: "",
     },
     basicInfoForm: {

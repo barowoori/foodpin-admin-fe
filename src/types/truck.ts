@@ -127,6 +127,10 @@ export interface TruckDetailData {
 
 export interface TruckOwnerFormState {
   ownerMemberId: string;
+  ownerMemberNickname: string;
+  ownerMemberPhone: string;
+  ownerMemberEmail: string;
+  ownerSocialLoginType: string;
   managerMemberIdsText: string;
 }
 
